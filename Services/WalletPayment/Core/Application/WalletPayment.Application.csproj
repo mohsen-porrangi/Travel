@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Common\Behaviors\" />
+    <Folder Include="Common\DTOs\" />
+    <Folder Include="Credit\Commands\AssignCreditLimit\" />
+    <Folder Include="Credit\Queries\GetCreditHistory\" />
+    <Folder Include="Transactions\Queries\GetTransactions\" />
+    <Folder Include="Wallet\Queries\GetWalletBalance\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Domain\WalletPayment.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,17 @@
+﻿using System.Linq;
+using UserManagement.API.Infrastructure.Data;
+
+namespace UserManagement.API.Endpoints.RoleManagement.Role.GetAllRoles;
+
+internal sealed class GetAllRolesQueryHandler(AppDbContext db)
+    : IQueryHandler<GetAllRolesQuery, GetAllRolesResult>
+{
+    public async Task<GetAllRolesResult> Handle(GetAllRolesQuery query, CancellationToken cancellationToken)
+    {
+        var roles = await db.Roles
+            .Select(r => new RoleDto(r.Id, r.Name))
+            .ToListAsync(cancellationToken);
+
+        return new GetAllRolesResult(roles);
+    }
+}
