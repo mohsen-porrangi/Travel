@@ -20,7 +20,7 @@ public class GetUserAccountsQueryHandler(IWalletRepository walletRepository)
             .Select(a => new AccountDto
             {
                 Id = a.Id,
-                AccountNumber = a.AccountNumber,
+                AccountNumber = a.CurrencyAccountCode,
                 Currency = a.Currency,
                 Balance = a.Balance,
                 IsActive = a.IsActive,

@@ -14,20 +14,63 @@ public class PaymentCallbackEndpoints : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("/payments/callback", async (
-            [FromQuery] string authority,
-            [FromQuery] string status,
-            [FromQuery] string userId,
-            [FromQuery] decimal amount,
-            [FromQuery] string orderId,
+        // --- ثبت یک endpoint عمومی کالبک با پارامتر تشخیص درگاه ---
+        app.MapGet("/payments/callback/{gatewayType?}", async (
+            [FromRoute] string? gatewayType,
+            HttpContext context,
             IPaymentService paymentService,
             IConfiguration configuration,
             ILogger<PaymentCallbackEndpoints> logger,
             CancellationToken cancellationToken) =>
         {
+            // دریافت پارامترهای کالبک بر اساس نوع درگاه
+            string authority;
+            string status;
+            string userId;
+            decimal amount = 0;
+            string orderId = "";
+
+            // تشخیص نوع درگاه یا استفاده از پارامتر ورودی
+            var gateway = gatewayType?.ToLower() ?? "";
+
+            // پردازش پارامترها بر اساس نوع درگاه
+            if (gateway == "zarinpal" || context.Request.Query.ContainsKey("Authority"))
+            {
+                // ZarinPal format
+                authority = context.Request.Query["Authority"].ToString();
+                status = context.Request.Query["Status"].ToString();
+                userId = context.Request.Query["userId"].ToString();
+                decimal.TryParse(context.Request.Query["Amount"].ToString(), out amount);
+                orderId = context.Request.Query["orderId"].ToString();
+            }
+            else if (gateway == "zibal" || context.Request.Query.ContainsKey("trackId"))
+            {
+                // Zibal format
+                authority = context.Request.Query["trackId"].ToString();
+                status = context.Request.Query["success"].ToString() == "1" ? "OK" : "NOK";
+                userId = context.Request.Query["userId"].ToString();
+                decimal.TryParse(context.Request.Query["amount"].ToString(), out amount);
+                orderId = context.Request.Query["orderId"].ToString();
+            }
+            else if (gateway == "sandbox" || context.Request.Query.ContainsKey("authority"))
+            {
+                // Sandbox format (lowercase 'authority')
+                authority = context.Request.Query["authority"].ToString();
+                status = context.Request.Query["status"].ToString();
+                userId = context.Request.Query["userId"].ToString();
+                decimal.TryParse(context.Request.Query["amount"].ToString(), out amount);
+                orderId = context.Request.Query["orderId"].ToString();
+            }
+            else
+            {
+                // دیگر درگاه‌ها یا فرمت ناشناخته
+                logger.LogWarning("فرمت کالبک ناشناخته: {QueryString}", context.Request.QueryString);
+                return Results.BadRequest(new { Message = "پارامترهای کالبک نامعتبر است" });
+            }
+
             logger.LogInformation(
-                "دریافت بازگشت از درگاه پرداخت. وضعیت: {Status}, شناسه: {Authority}, کاربر: {UserId}",
-                status, authority, userId);
+                "دریافت بازگشت از درگاه پرداخت. وضعیت: {Status}, شناسه: {Authority}, کاربر: {UserId}, شناسه سفارش: {OrderId}",
+                status, authority, userId, orderId);
 
             // بررسی و تبدیل پارامترها
             if (!Guid.TryParse(userId, out var userGuid))
@@ -84,6 +127,7 @@ public class PaymentCallbackEndpoints : ICarterModule
         .WithTags("Payments")
         .AllowAnonymous();
 
+        // Endpoint کالبک برای خرید یکپارچه به همان شکل حفظ می‌شود
         app.MapGet("/payments/integrated-callback", async (
             [FromQuery] string authority,
             [FromQuery] string status,
@@ -167,86 +211,6 @@ public class PaymentCallbackEndpoints : ICarterModule
         })
         .WithTags("Payments")
         .AllowAnonymous();
-
-        // مسیرهای کالبک اختصاصی درگاه‌های مختلف
-
-        // ZarinPal callback
-        app.MapGet("/payments/callback/zarinpal", async (
-            HttpContext context,
-            IPaymentService paymentService,
-            IConfiguration configuration,
-            CancellationToken cancellationToken) =>
-        {
-            var authority = context.Request.Query["Authority"].ToString();
-            var status = context.Request.Query["Status"].ToString();
-            var userId = context.Request.Query["userId"].ToString();
-            decimal amount = 0;
-            decimal.TryParse(context.Request.Query["Amount"].ToString(), out amount);
-            var orderId = context.Request.Query["orderId"].ToString();
-
-            // هدایت به مسیر عمومی callback
-            var redirectUrl = $"/payments/callback?authority={Uri.EscapeDataString(authority)}" +
-                             $"&status={Uri.EscapeDataString(status)}" +
-                             $"&userId={Uri.EscapeDataString(userId)}" +
-                             $"&amount={amount}" +
-                             $"&orderId={Uri.EscapeDataString(orderId)}";
-
-            return Results.Redirect(redirectUrl);
-        })
-        .WithTags("Payments")
-        .AllowAnonymous();
-
-        // Zibal callback
-        app.MapGet("/payments/callback/zibal", async (
-            HttpContext context,
-            IPaymentService paymentService,
-            IConfiguration configuration,
-            CancellationToken cancellationToken) =>
-        {
-            var trackId = context.Request.Query["trackId"].ToString();
-            var success = context.Request.Query["success"].ToString();
-            var status = success == "1" ? "OK" : "NOK";
-            var userId = context.Request.Query["userId"].ToString();
-            decimal amount = 0;
-            decimal.TryParse(context.Request.Query["amount"].ToString(), out amount);
-            var orderId = context.Request.Query["orderId"].ToString();
-
-            // هدایت به مسیر عمومی callback
-            var redirectUrl = $"/payments/callback?authority={Uri.EscapeDataString(trackId)}" +
-                             $"&status={Uri.EscapeDataString(status)}" +
-                             $"&userId={Uri.EscapeDataString(userId)}" +
-                             $"&amount={amount}" +
-                             $"&orderId={Uri.EscapeDataString(orderId)}";
-
-            return Results.Redirect(redirectUrl);
-        })
-        .WithTags("Payments")
-        .AllowAnonymous();
-
-        // Sandbox callback
-        app.MapGet("/payments/callback/sandbox", async (
-            HttpContext context,
-            IPaymentService paymentService,
-            IConfiguration configuration,
-            CancellationToken cancellationToken) =>
-        {
-            var authority = context.Request.Query["authority"].ToString();
-            var status = context.Request.Query["status"].ToString();
-            var userId = context.Request.Query["userId"].ToString();
-            decimal amount = 0;
-            decimal.TryParse(context.Request.Query["amount"].ToString(), out amount);
-            var orderId = context.Request.Query["orderId"].ToString();
-
-            // هدایت به مسیر عمومی callback
-            var redirectUrl = $"/payments/callback?authority={Uri.EscapeDataString(authority)}" +
-                             $"&status={Uri.EscapeDataString(status)}" +
-                             $"&userId={Uri.EscapeDataString(userId)}" +
-                             $"&amount={amount}" +
-                             $"&orderId={Uri.EscapeDataString(orderId)}";
-
-            return Results.Redirect(redirectUrl);
-        })
-        .WithTags("Payments")
-        .AllowAnonymous();
+    
     }
 }

@@ -13,6 +13,8 @@ public class AccountSnapshotEndpoints : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
+  
+
         app.MapGet("/accounts/{accountId:guid}/snapshots", async (
             Guid accountId,
             [FromQuery] DateTime? startDate,
@@ -28,28 +30,6 @@ public class AccountSnapshotEndpoints : ICarterModule
         .WithTags("AccountSnapshots")
         .RequireAuthorization();
 
-        app.MapPost("/accounts/{accountId:guid}/snapshots", async (
-            Guid accountId,
-            [FromQuery] SnapshotType type,
-            IAccountSnapshotService snapshotService,
-            CancellationToken cancellationToken) =>
-        {
-            await snapshotService.CreateSnapshotAsync(accountId, type, cancellationToken);
-            return Results.Ok(new { Message = "اسنپ‌شات با موفقیت ایجاد شد" });
-        })
-        .WithTags("AccountSnapshots")
-        .RequireAuthorization();
-
-        app.MapPost("/accounts/snapshots/bulk", async (
-            [FromQuery] SnapshotType type,
-            IAccountSnapshotService snapshotService,
-            CancellationToken cancellationToken) =>
-        {
-            await snapshotService.CreateSnapshotsForAllAccountsAsync(type, cancellationToken);
-            return Results.Ok(new { Message = "اسنپ‌شات با موفقیت برای تمام حساب‌های فعال ایجاد شد" });
-        })
-        .WithTags("AccountSnapshots")
-        .RequireAuthorization();
 
         app.MapGet("/accounts/{accountId:guid}/balance-history", async (
             Guid accountId,
@@ -58,11 +38,11 @@ public class AccountSnapshotEndpoints : ICarterModule
             [FromQuery] SnapshotType? type,
             ISender sender,
             CancellationToken cancellationToken) =>
-                {
-                    var query = new GetAccountBalanceHistoryQuery(accountId, startDate, endDate, type);
-                    var result = await sender.Send(query, cancellationToken);
-                    return Results.Ok(result);
-                })
+        {
+            var query = new GetAccountBalanceHistoryQuery(accountId, startDate, endDate, type);
+            var result = await sender.Send(query, cancellationToken);
+            return Results.Ok(result);
+        })
             .WithTags("AccountSnapshots")
             .RequireAuthorization();
     }

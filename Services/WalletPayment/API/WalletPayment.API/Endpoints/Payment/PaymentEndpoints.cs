@@ -2,7 +2,9 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using WalletPayment.Application.Common.Contracts;
+using WalletPayment.Application.Payment.Commands.CreateIntegratedPurchase;
 using WalletPayment.Application.Payment.Contracts;
+using WalletPayment.Application.Transactions.Commands.IntegratedPurchase;
 using WalletPayment.Domain.Entities.Enums;
 
 namespace WalletPayment.API.Endpoints.Payment;
@@ -122,43 +124,55 @@ public class PaymentEndpoints : ICarterModule
         .WithTags("Payments")
         .RequireAuthorization();
 
-        app.MapPost("/payments/integrated", async (
-            [FromBody] IntegratedPaymentRequest request,
-            IPaymentService paymentService,
+
+
+        app.MapPost("/integrated-purchase", async (
+            [FromBody] IntegratedPurchaseCommand command,
+            ISender sender,
             CancellationToken cancellationToken) =>
         {
-            var result = await paymentService.CreateIntegratedPaymentAsync(
-                request.UserId,
-                request.Amount,
-                request.Currency,
-                request.Description,
-                request.GatewayType,
-                request.CallbackUrl,
-                request.OrderId,
-                request.Metadata,
-                cancellationToken);
-
-            if (result.IsSuccessful)
-            {
-                return Results.Ok(new
-                {
-                    IsSuccessful = true,
-                    PaymentUrl = result.PaymentUrl,
-                    Authority = result.Authority
-                });
-            }
-            else
-            {
-                return Results.BadRequest(new
-                {
-                    IsSuccessful = false,
-                    ErrorMessage = result.ErrorMessage
-                });
-            }
+            var result = await sender.Send(command, cancellationToken);
+            return Results.Ok(result);
         })
+        .WithTags("IntegratedPurchase")
+        .RequireAuthorization();
+
+        app.MapPost("/payments/integrated-purchase", async (
+            [FromBody] IntegratedPaymentRequest request,
+            ISender sender,
+            CancellationToken cancellationToken) =>
+                {
+                    // ایجاد کامند مناسب
+                    var command = new CreateIntegratedPurchaseCommand
+                    {
+                        UserId = request.UserId,
+                        Amount = request.Amount,
+                        Currency = request.Currency,
+                        Description = request.Description,
+                        GatewayType = request.GatewayType,
+                        CallbackUrl = request.CallbackUrl,
+                        OrderId = request.OrderId,
+                        Metadata = request.Metadata
+                    };
+        
+                    // ارسال کامند به هندلر مربوطه
+                    var result = await sender.Send(command, cancellationToken);
+        
+                    // بررسی نتیجه
+                    if (result.IsSuccessful)
+                    {
+                        return Results.Ok(result);
+                    }
+                    else
+                    {
+                        return Results.BadRequest(result);
+                    }
+                })
         .WithTags("Payments")
+        .WithName("IntegratedPurchase")
         .RequireAuthorization();
     }
+
 }
 
 // مدل‌های درخواست
