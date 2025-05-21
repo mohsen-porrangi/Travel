@@ -39,6 +39,7 @@ public static class DependencyInjection
         services.AddScoped<IAccountSnapshotService, AccountSnapshotService>();
         services.AddScoped<INotificationService, NotificationService>();
         services.AddScoped<IPaymentTransactionService, PaymentTransactionService>();
+        services.AddScoped<IRefundService, RefundService>();
 
         // اضافه کردن سرویس‌های پرداخت
         AddPaymentServices(services, configuration);

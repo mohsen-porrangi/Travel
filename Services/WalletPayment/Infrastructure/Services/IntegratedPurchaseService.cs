@@ -3,9 +3,8 @@ using Microsoft.Extensions.Logging;
 using WalletPayment.Application.Common.Contracts;
 using WalletPayment.Application.Payment.Contracts;
 using WalletPayment.Domain.Entities.Enums;
-using Application.Transactions.Commands.DepositToWallet;
-using Application.Transactions.Commands.WithdrawFromWallet;
 using MediatR;
+using WalletPayment.Application.Transactions.Commands.ProcessTransaction;
 
 namespace WalletPayment.Infrastructure.Services;
 
@@ -153,22 +152,27 @@ public class IntegratedPurchaseService : IIntegratedPurchaseService
             try
             {
                 // 1. شارژ کیف پول
-                var depositCommand = new DepositToWalletCommand(
+                var depositCommand = new ProcessWalletTransactionCommand(
                     userId,
                     amount,
                     currency,
+                    TransactionDirection.In,
                     paymentReferenceId,
-                    $"شارژ خودکار برای سفارش {orderId} - {description}");
+                    null,
+                    description);
+                   //TODO $"شارژ خودکار برای سفارش {orderId} - {description}");
 
                 var depositResult = await _mediator.Send(depositCommand, cancellationToken);
 
                 // 2. برداشت از کیف پول برای خرید
-                var withdrawCommand = new WithdrawFromWalletCommand(
-                    userId,
-                    amount,
-                    currency,
-                    orderId,
-                    description);
+                var withdrawCommand = new ProcessWalletTransactionCommand(
+                     userId,
+                     amount,
+                     currency,
+                     TransactionDirection.Out,
+                     null,
+                     orderId,
+                     description);
 
                 var withdrawResult = await _mediator.Send(withdrawCommand, cancellationToken);
 

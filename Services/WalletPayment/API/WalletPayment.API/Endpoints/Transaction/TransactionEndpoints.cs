@@ -1,5 +1,4 @@
-﻿using Application.Transactions.Commands.DepositToWallet;
-using Application.Transactions.Commands.WithdrawFromWallet;
+﻿
 using Carter;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -14,27 +13,6 @@ public class TransactionEndpoints : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPost("/wallets/deposit", async (
-            [FromBody] DepositToWalletCommand command,
-            ISender sender,
-            CancellationToken cancellationToken) =>
-        {
-            var result = await sender.Send(command, cancellationToken);
-            return Results.Ok(result);
-        })
-        .WithTags("Transactions")
-        .RequireAuthorization();
-
-        app.MapPost("/wallets/withdraw", async (
-            [FromBody] WithdrawFromWalletCommand command,
-            ISender sender,
-            CancellationToken cancellationToken) =>
-        {
-            var result = await sender.Send(command, cancellationToken);
-            return Results.Ok(result);
-        })
-        .WithTags("Transactions")
-        .RequireAuthorization();
 
         app.MapGet("/wallets/{userId:guid}/transactions", async (
           Guid userId,

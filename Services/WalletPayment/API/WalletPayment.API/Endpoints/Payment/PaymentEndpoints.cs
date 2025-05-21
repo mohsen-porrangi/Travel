@@ -1,25 +1,24 @@
 ﻿using Carter;
-using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using WalletPayment.API.Models.Payment;
 using WalletPayment.Application.Common.Contracts;
-using WalletPayment.Application.Payment.Commands.CreateIntegratedPurchase;
 using WalletPayment.Application.Payment.Contracts;
-using WalletPayment.Application.Transactions.Commands.IntegratedPurchase;
-using WalletPayment.Domain.Entities.Enums;
-
-namespace WalletPayment.API.Endpoints.Payment;
 
 public class PaymentEndpoints : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPost("/payments/create", async (
+        // 1. ایجاد درخواست پرداخت
+        app.MapPost("/payments", async (
             [FromBody] CreatePaymentRequest request,
-            IPaymentService paymentService,
+            [FromServices] ICurrentUserService currentUserService,
+            [FromServices] IPaymentService paymentService,
             CancellationToken cancellationToken) =>
         {
+            var userId = currentUserService.GetCurrentUserId();
+
             var result = await paymentService.CreatePaymentRequestAsync(
-                request.UserId,
+                userId, // از کاربر جاری
                 request.Amount,
                 request.Currency,
                 request.Description,
@@ -50,14 +49,18 @@ public class PaymentEndpoints : ICarterModule
             }
         })
         .WithTags("Payments")
+        .WithName("CreatePayment")
         .RequireAuthorization();
 
+        // 2. دریافت جزئیات پرداخت
         app.MapGet("/payments/{paymentId:guid}", async (
             Guid paymentId,
-            Guid userId,
-            IPaymentService paymentService,
+            [FromServices] ICurrentUserService currentUserService,
+            [FromServices] IPaymentService paymentService,
             CancellationToken cancellationToken) =>
         {
+            var userId = currentUserService.GetCurrentUserId();
+
             try
             {
                 var paymentDetails = await paymentService.GetPaymentDetailsAsync(
@@ -74,77 +77,25 @@ public class PaymentEndpoints : ICarterModule
             }
         })
         .WithTags("Payments")
+        .WithName("GetPaymentDetails")
         .RequireAuthorization();
 
-        app.MapGet("/users/{userId:guid}/payments", async (
-            Guid userId,
+        // 3. دریافت تاریخچه پرداخت‌های کاربر جاری
+        app.MapGet("/payments/history", async (
+            [FromServices] ICurrentUserService currentUserService,
+            [FromServices] IPaymentService paymentService,
             [FromQuery] int pageNumber = 1,
-            [FromQuery] int pageSize = 10,
-            IPaymentService paymentService = null,
+            [FromQuery] int pageSize = 10,           
             CancellationToken cancellationToken = default) =>
         {
+            var userId = currentUserService.GetCurrentUserId();
+
             var paymentHistory = await paymentService.GetPaymentHistoryAsync(
                 userId, pageNumber, pageSize, cancellationToken);
             return Results.Ok(paymentHistory);
         })
         .WithTags("Payments")
+        .WithName("GetPaymentHistory")
         .RequireAuthorization();
-
-        app.MapPost("/payments/{paymentId:guid}/refund", async (
-            Guid paymentId,
-            [FromBody] RefundPaymentRequest request,
-            IPaymentService paymentService,
-            CancellationToken cancellationToken) =>
-        {
-            var result = await paymentService.RefundPaymentAsync(
-                paymentId,
-                request.UserId,
-                request.Reason,
-                request.Amount,
-                cancellationToken);
-
-            if (result.IsSuccessful)
-            {
-                return Results.Ok(new
-                {
-                    IsSuccessful = true,
-                    RefundTrackingId = result.RefundTrackingId
-                });
-            }
-            else
-            {
-                return Results.BadRequest(new
-                {
-                    IsSuccessful = false,
-                    ErrorMessage = result.ErrorMessage,
-                    ErrorCode = result.ErrorCode
-                });
-            }
-        })
-        .WithTags("Payments")
-        .RequireAuthorization();
-       
     }
-
-}
-
-// مدل‌های درخواست
-public class CreatePaymentRequest
-{
-    public Guid UserId { get; set; }
-    public decimal Amount { get; set; }
-    public CurrencyCode Currency { get; set; } = CurrencyCode.IRR;
-    public string Description { get; set; } = string.Empty;
-    public PaymentGatewayType GatewayType { get; set; } = PaymentGatewayType.ZarinPal;
-    public string CallbackUrl { get; set; } = string.Empty;
-    public Dictionary<string, string>? Metadata { get; set; }
-    public string? OrderId { get; set; }
-    public string? CancelUrl { get; set; }
-}
-
-public class RefundPaymentRequest
-{
-    public Guid UserId { get; set; }
-    public string Reason { get; set; } = string.Empty;
-    public decimal? Amount { get; set; }
 }
