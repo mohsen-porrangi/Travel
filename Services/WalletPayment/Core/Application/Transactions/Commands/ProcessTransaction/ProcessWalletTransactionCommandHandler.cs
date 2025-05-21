@@ -22,15 +22,15 @@ public class ProcessWalletTransactionCommandHandler(
             throw new BadRequestException("کیف پول غیرفعال است و امکان انجام تراکنش وجود ندارد");
 
         // پیدا کردن حساب متناسب با ارز درخواستی یا ایجاد حساب جدید
-        var account = wallet.Accounts.FirstOrDefault(a => a.Currency == request.Currency && a.IsActive);
-        if (account == null)
+        var currencyAccount = wallet.CurrencyAccount.FirstOrDefault(a => a.Currency == request.Currency && a.IsActive);
+        if (currencyAccount == null)
         {
             if (request.Direction == TransactionDirection.Out)
                 throw new NotFoundException($"حساب با ارز {request.Currency} برای کاربر یافت نشد", request.UserId);
 
             // برای واریز، حساب جدید ایجاد می‌کنیم
             string accountNumber = GenerateAccountNumber();
-            account = wallet.CreateAccount(request.Currency, accountNumber);
+            currencyAccount = wallet.CreateAccount(request.Currency);
         }
 
         try
@@ -41,7 +41,7 @@ public class ProcessWalletTransactionCommandHandler(
             if (request.Direction == TransactionDirection.In)
             {
                 // واریز به حساب
-                transaction = account.Deposit(
+                transaction = currencyAccount.Deposit(
                     request.Amount,
                     request.Description,
                     request.ReferenceId);
@@ -49,7 +49,7 @@ public class ProcessWalletTransactionCommandHandler(
             else
             {
                 // برداشت از حساب
-                transaction = account.Withdraw(
+                transaction = currencyAccount.Withdraw(
                     request.Amount,
                     TransactionType.Purchase,
                     request.Description,
@@ -65,16 +65,16 @@ public class ProcessWalletTransactionCommandHandler(
             {
                 TransactionId = transaction.Id,
                 WalletId = wallet.Id,
-                AccountId = account.Id,
+                AccountId = currencyAccount.Id,
                 Amount = request.Amount,
-                NewBalance = account.Balance,
+                NewBalance = currencyAccount.Balance,
                 Direction = request.Direction,
                 TransactionDate = transaction.TransactionDate
             };
         }
         catch (InvalidOperationException ex) when (ex.Message.Contains("موجودی کافی نیست"))
         {
-            throw new InsufficientBalanceException(wallet.Id, request.Amount, account.Balance);
+            throw new InsufficientBalanceException(wallet.Id, request.Amount, currencyAccount.Balance);
         }
     }
 

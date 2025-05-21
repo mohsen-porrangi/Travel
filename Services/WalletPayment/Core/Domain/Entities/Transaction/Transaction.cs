@@ -4,7 +4,7 @@ using TransactionStatus = WalletPayment.Domain.Entities.Enums.TransactionStatus;
 using TransactionType = WalletPayment.Domain.Entities.Enums.TransactionType;
 
 namespace WalletPayment.Domain.Entities.Transaction;
-public class Transaction : EntityWithDomainEvents
+public class Transaction : EntityWithDomainEvents<Guid>
 {
     public Guid WalletId { get; private set; }
     public Guid AccountInfoId { get; private set; }
@@ -41,7 +41,7 @@ public class Transaction : EntityWithDomainEvents
     }
   
     public Transaction(
-        Guid accountInfoId,
+        Guid currencyAccountId,
         Guid walletId,
         decimal amount,
         TransactionDirection direction,
@@ -54,9 +54,8 @@ public class Transaction : EntityWithDomainEvents
         string paymentReferenceId = null,
         string orderId = null,
         Guid? relatedTransactionId = null)
-    {
-        Id = Guid.NewGuid();
-        AccountInfoId = accountInfoId;
+    {        
+        AccountInfoId = currencyAccountId;
         WalletId = walletId;
         Amount = amount;
         Direction = direction;

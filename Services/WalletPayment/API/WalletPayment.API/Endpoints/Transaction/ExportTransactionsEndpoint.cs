@@ -2,6 +2,7 @@
 using Carter;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using WalletPayment.Application.Common.Contracts;
 using WalletPayment.Application.Transactions.Queries.Common;
 using WalletPayment.Application.Transactions.Queries.ExportTransactions;
 using WalletPayment.Domain.Entities.Enums;
@@ -12,20 +13,20 @@ public class ExportTransactionsEndpoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("/wallets/{userId:guid}/transactions/export", async (
-        Guid userId,
-        ISender sender,
-        CancellationToken cancellationToken,  // پارامتر اجباری بدون مقدار پیش‌فرض
-        [FromQuery] ExportFormat format = ExportFormat.Csv,
-        [FromQuery] DateTime? startDate = null,
-        [FromQuery] DateTime? endDate = null,
-        [FromQuery] TransactionDirection? direction = null,
-        [FromQuery] Domain.Entities.Enums.TransactionType? type = null,
-        [FromQuery] TransactionStatus? status = null,
-        [FromQuery] CurrencyCode? currency = null,
-        [FromQuery] decimal? minAmount = null,
-        [FromQuery] decimal? maxAmount = null,
-        [FromQuery] bool? isCredit = null) =>
+        app.MapGet("/wallets/transactions/export", async (
+            [FromServices] ICurrentUserService currentUserService,
+            ISender sender,
+            CancellationToken cancellationToken,  // پارامتر اجباری بدون مقدار پیش‌فرض
+            [FromQuery] ExportFormat format = ExportFormat.Csv,
+            [FromQuery] DateTime? startDate = null,
+            [FromQuery] DateTime? endDate = null,
+            [FromQuery] TransactionDirection? direction = null,
+            [FromQuery] Domain.Entities.Enums.TransactionType? type = null,
+            [FromQuery] TransactionStatus? status = null,
+            [FromQuery] CurrencyCode? currency = null,
+            [FromQuery] decimal? minAmount = null,
+            [FromQuery] decimal? maxAmount = null,
+            [FromQuery] bool? isCredit = null) =>
         {
             var filter = new TransactionFilter
             {
@@ -42,7 +43,7 @@ public class ExportTransactionsEndpoint : ICarterModule
 
             var query = new ExportTransactionsQuery
             {
-                UserId = userId,
+                UserId = currentUserService.GetCurrentUserId(),
                 Format = format,
                 Filter = filter
             };

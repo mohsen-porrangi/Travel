@@ -11,10 +11,9 @@ public record WalletDetailsDto(
     decimal CreditBalance,
     DateTime? CreditDueDate,
     bool IsActive,
-    ICollection<AccountDto> Accounts);
+    ICollection<CurrencyAccountDTO> Accounts);
 
-public record AccountDto(
-    Guid Id,
-    string AccountNumber,
+public record CurrencyAccountDTO(
+    Guid Id,    
     CurrencyCode Currency,
     decimal Balance);

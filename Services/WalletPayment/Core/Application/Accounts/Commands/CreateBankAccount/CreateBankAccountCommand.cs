@@ -3,8 +3,7 @@
 namespace WalletPayment.Application.Accounts.Commands.CreateBankAccount;
 
 public record CreateBankAccountCommand : ICommand<CreateBankAccountResponse>
-{
-    public Guid UserId { get; init; }
+{    
     public string AccountNumber { get; init; }
     public string BankName { get; init; }
     public string CardNumber { get; init; }

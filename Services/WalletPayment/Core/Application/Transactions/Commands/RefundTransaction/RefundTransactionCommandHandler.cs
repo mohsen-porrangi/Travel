@@ -67,11 +67,11 @@ public class RefundTransactionCommandHandler(
         if (wallet == null)
             throw new NotFoundException("کیف پول یافت نشد", originalTransaction.WalletId);
 
-        var account = wallet.Accounts.FirstOrDefault(a => a.Id == originalTransaction.AccountInfoId);
-        if (account == null)
+        var currencyAccount = wallet.CurrencyAccount.FirstOrDefault(a => a.Id == originalTransaction.AccountInfoId);
+        if (currencyAccount == null)
             throw new NotFoundException("حساب مورد نظر یافت نشد", originalTransaction.AccountInfoId);
 
-        if (!account.IsActive || !wallet.IsActive)
+        if (!currencyAccount.IsActive || !wallet.IsActive)
             throw new BadRequestException("کیف پول یا حساب غیرفعال است");
 
         // شروع تراکنش
@@ -83,14 +83,14 @@ public class RefundTransactionCommandHandler(
             wallet.AddDomainEvent(new RefundInitiatedEvent(
                 originalTransaction.Id,
                 wallet.Id,
-                account.Id,
+                currencyAccount.Id,
                 refundAmount,
                 originalTransaction.Currency,
                 request.Reason));
 
             // ایجاد تراکنش استرداد (واریز به حساب کاربر)
             var description = $"استرداد تراکنش {originalTransaction.Id} - {request.Reason}";
-            var refundTransaction = account.Deposit(
+            var refundTransaction = currencyAccount.Deposit(
                 refundAmount,
                 description,
                 $"REFUND-{originalTransaction.Id}");
@@ -124,7 +124,7 @@ public class RefundTransactionCommandHandler(
                 RefundTransactionId = refundTransaction.Id,
                 OriginalTransactionId = originalTransaction.Id,
                 RefundedAmount = refundAmount,
-                NewAccountBalance = account.Balance,
+                NewAccountBalance = currencyAccount.Balance,
                 RefundDate = refundTransaction.TransactionDate,
                 IsPartial = !isFullRefund
             };

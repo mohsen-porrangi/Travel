@@ -7,7 +7,7 @@ using WalletPayment.Domain.Entities.Enums;
 using WalletPayment.Domain.Events;
 
 namespace WalletPayment.Domain.Entities.Wallet;
-public class Wallet : EntityWithDomainEvents, IAggregateRoot, ISoftDelete
+public class Wallet : EntityWithDomainEvents<Guid>, IAggregateRoot, ISoftDelete
 {
     public Guid UserId { get; private set; }
     public decimal CreditLimit { get; private set; }
@@ -15,18 +15,17 @@ public class Wallet : EntityWithDomainEvents, IAggregateRoot, ISoftDelete
     public DateTime? CreditDueDate { get; private set; }
     public bool IsActive { get; private set; }
 
-    private readonly List<CurrencyAccount> _accounts = new();
+    private readonly List<CurrencyAccount> _currencyAccount = new();
     private readonly List<CreditHistory> _creditHistory = new();
     public IReadOnlyCollection<CreditHistory> CreditHistory => _creditHistory.AsReadOnly();
-    public IReadOnlyCollection<CurrencyAccount> Accounts => _accounts.AsReadOnly();
+    public IReadOnlyCollection<CurrencyAccount> CurrencyAccount => _currencyAccount.AsReadOnly();
 
     
     private Wallet() { }
 
 
     public Wallet(Guid userId)
-    {
-        Id = Guid.NewGuid();
+    {        
         UserId = userId;
         CreditLimit = 0;
         CreditBalance = 0;
@@ -39,18 +38,18 @@ public class Wallet : EntityWithDomainEvents, IAggregateRoot, ISoftDelete
         AddDomainEvent(new WalletCreatedEvent(Id, userId));
     }
     // ایجاد یک حساب جدید برای ارز مشخص
-    public CurrencyAccount CreateAccount(CurrencyCode currency, string accountNumber)
+    public CurrencyAccount CreateAccount(CurrencyCode currency)
     {
-        if (_accounts.Any(a => a.Currency == currency && !a.IsDeleted))
+        if (_currencyAccount.Any(a => a.Currency == currency && !a.IsDeleted))
             throw new InvalidOperationException($"حساب با ارز {currency} قبلاً برای این کیف پول ایجاد شده است");
 
-        var account = new CurrencyAccount(this.Id, currency, accountNumber);
-        _accounts.Add(account);
+        var currencyAccount = new CurrencyAccount(this.Id, currency);
+        _currencyAccount.Add(currencyAccount);
 
         UpdatedAt = DateTime.UtcNow;
-        AddDomainEvent(new AccountCreatedEvent(Id, account.Id, currency));
+        AddDomainEvent(new AccountCreatedEvent(Id, currencyAccount.Id, currency));
 
-        return account;
+        return currencyAccount;
     }    
     // اختصاص اعتبار به کیف پول
     public void AssignCredit(decimal amount, DateTime dueDate, string description)

@@ -24,7 +24,7 @@ public class ConvertCurrencyCommandHandler(
             throw new BadRequestException("کیف پول غیرفعال است");
 
         // بررسی حساب مبدأ
-        var sourceAccount = wallet.Accounts
+        var sourceAccount = wallet.CurrencyAccount
             .FirstOrDefault(a => a.Currency == request.SourceCurrency && a.IsActive);
 
         if (sourceAccount == null)
@@ -37,14 +37,13 @@ public class ConvertCurrencyCommandHandler(
                 wallet.Id, request.SourceAmount, sourceAccount.Balance);
 
         // بررسی/ایجاد حساب مقصد
-        var targetAccount = wallet.Accounts
+        var targetAccount = wallet.CurrencyAccount
             .FirstOrDefault(a => a.Currency == request.TargetCurrency && a.IsActive);
 
         if (targetAccount == null)
         {
-            // ایجاد خودکار حساب مقصد
-            string accountNumber = GenerateAccountNumber();
-            targetAccount = wallet.CreateAccount(request.TargetCurrency, accountNumber);
+            // ایجاد خودکار حساب مقصد            
+            targetAccount = wallet.CreateAccount(request.TargetCurrency);
         }
 
         // دریافت نرخ تبدیل

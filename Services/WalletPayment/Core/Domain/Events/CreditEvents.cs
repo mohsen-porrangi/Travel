@@ -20,7 +20,7 @@ public record CreditAssignedEvent : IntegrationEvent
 
 public record CreditSettledEvent : IntegrationEvent
 {
-    public CreditSettledEvent(Guid walletId, Guid creditHistoryId, decimal amount)
+    public CreditSettledEvent(Guid walletId, long creditHistoryId, decimal amount)
     {
         WalletId = walletId;
         CreditHistoryId = creditHistoryId;
@@ -29,7 +29,7 @@ public record CreditSettledEvent : IntegrationEvent
     }
 
     public Guid WalletId { get; }
-    public Guid CreditHistoryId { get; }
+    public long CreditHistoryId { get; }
     public decimal Amount { get; }
 }
 

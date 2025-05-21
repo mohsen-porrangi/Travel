@@ -20,20 +20,20 @@ public class GetAccountStatementQueryHandler(
             throw new NotFoundException("کیف پول برای کاربر مورد نظر یافت نشد", request.UserId);
 
         // یافتن حساب با ارز درخواستی
-        var account = wallet.Accounts.FirstOrDefault(a => a.Currency == request.Currency);
-        if (account == null)
+        var currencyAccount = wallet.CurrencyAccount.FirstOrDefault(a => a.Currency == request.Currency);
+        if (currencyAccount == null)
             throw new NotFoundException($"حساب با ارز {request.Currency} برای کاربر یافت نشد", request.UserId);
 
         // محاسبه موجودی ابتدایی (قبل از شروع بازه گزارش)
         var openingBalanceTransactions = await dbContext.Transactions
-            .Where(t => t.AccountInfoId == account.Id && t.TransactionDate < request.StartDate)
+            .Where(t => t.AccountInfoId == currencyAccount.Id && t.TransactionDate < request.StartDate)
             .ToListAsync(cancellationToken);
 
         decimal openingBalance = CalculateBalance(openingBalanceTransactions);
 
         // دریافت تراکنش‌های بازه زمانی
         var periodTransactions = await dbContext.Transactions
-            .Where(t => t.AccountInfoId == account.Id &&
+            .Where(t => t.AccountInfoId == currencyAccount.Id &&
                   t.TransactionDate >= request.StartDate &&
                   t.TransactionDate <= request.EndDate)
             .OrderBy(t => t.TransactionDate)

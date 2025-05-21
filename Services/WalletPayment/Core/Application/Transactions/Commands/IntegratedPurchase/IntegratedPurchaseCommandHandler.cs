@@ -22,11 +22,10 @@ public class IntegratedPurchaseCommandHandler(
                 throw new BadRequestException("کیف پول غیرفعال است و امکان خرید وجود ندارد");
 
             // پیدا کردن حساب متناسب با ارز درخواستی یا ایجاد حساب جدید
-            var account = wallet.Accounts.FirstOrDefault(a => a.Currency == request.Currency && a.IsActive);
+            var account = wallet.CurrencyAccount.FirstOrDefault(a => a.Currency == request.Currency && a.IsActive);
             if (account == null)
-            {
-                string accountNumber = GenerateAccountNumber();
-                account = wallet.CreateAccount(request.Currency, accountNumber);
+            {                
+                account = wallet.CreateAccount(request.Currency);
             }
 
             // بررسی موجودی حساب و تبدیل ارز در صورت نیاز
@@ -39,7 +38,7 @@ public class IntegratedPurchaseCommandHandler(
             if (account.Balance < requiredAmount && request.AutoConvertCurrency)
             {
                 // بررسی سایر حساب‌ها برای موجودی کافی
-                var otherAccounts = wallet.Accounts
+                var otherAccounts = wallet.CurrencyAccount
                     .Where(a => a.IsActive && a.Balance > 0 && a.Currency != request.Currency)
                     .OrderByDescending(a => a.Balance) // اولویت با حساب‌های با موجودی بیشتر
                     .ToList();
@@ -76,7 +75,7 @@ public class IntegratedPurchaseCommandHandler(
                 // اگر نیاز به تبدیل ارز باشد، ابتدا تبدیل انجام می‌شود
                 if (needsCurrencyConversion && sourceAccountId.HasValue)
                 {
-                    var sourceAccount = wallet.Accounts.First(a => a.Id == sourceAccountId.Value);
+                    var sourceAccount = wallet.CurrencyAccount.First(a => a.Id == sourceAccountId.Value);
 
                     // برداشت از حساب منبع
                     var withdrawDescription = $"تبدیل ارز از {sourceAccount.Currency} به {request.Currency} برای خرید {request.Description}";

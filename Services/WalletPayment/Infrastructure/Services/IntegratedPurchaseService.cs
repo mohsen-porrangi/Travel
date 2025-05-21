@@ -190,7 +190,7 @@ public class IntegratedPurchaseService : IIntegratedPurchaseService
                     DepositTransactionId = depositResult.TransactionId,
                     WithdrawTransactionId = withdrawResult.TransactionId,
                     Amount = amount,
-                    RemainingBalance = withdrawResult.RemainingBalance
+             //TODO       RemainingBalance = withdrawResult.RemainingBalance
                 };
             }
             catch (Exception ex)

@@ -25,9 +25,8 @@ public class GetWalletByUserIdQueryHandler(IWalletRepository walletRepository)
             wallet.CreditBalance,
             wallet.CreditDueDate,
             wallet.IsActive,
-            wallet.Accounts.Select(a => new AccountDto(
-                a.Id,
-                a.AccountNumber,
+            wallet.CurrencyAccount.Select(a => new CurrencyAccountDTO(
+                a.Id,                
                 a.Currency,
                 a.Balance
             )).ToList()

@@ -16,6 +16,6 @@ public abstract class EntityWithDomainEventsBase<TKey> : BaseEntity<TKey>, IHasD
     public void ClearDomainEvents() => _domainEvents.Clear();
 }
 
-public abstract class EntityWithDomainEvents : EntityWithDomainEventsBase<Guid>
+public abstract class EntityWithDomainEvents<TKey> : EntityWithDomainEventsBase<TKey>
 {
 }

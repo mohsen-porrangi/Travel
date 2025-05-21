@@ -40,7 +40,7 @@ public class CreateIntegratedPurchaseCommandHandler :
             }
 
             // یافتن حساب با ارز مورد نظر
-            var account = wallet.Accounts.FirstOrDefault(a => a.Currency == request.Currency && a.IsActive);
+            var account = wallet.CurrencyAccount.FirstOrDefault(a => a.Currency == request.Currency && a.IsActive);
             decimal currentBalance = account?.Balance ?? 0;
 
             // محاسبه مبلغی که باید از درگاه پرداخت شود

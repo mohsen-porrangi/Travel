@@ -15,12 +15,11 @@ public class GetUserAccountsQueryHandler(IWalletRepository walletRepository)
             throw new NotFoundException("کیف پول یافت نشد", request.UserId);
 
         // تبدیل حساب‌ها به DTO
-        var accountDtos = wallet.Accounts
+        var accountDtos = wallet.CurrencyAccount
             .Where(a => !a.IsDeleted)
-            .Select(a => new AccountDto
+            .Select(a => new CurrencyAccountDto
             {
-                Id = a.Id,
-                AccountNumber = a.CurrencyAccountCode,
+                Id = a.Id,                
                 Currency = a.Currency,
                 Balance = a.Balance,
                 IsActive = a.IsActive,

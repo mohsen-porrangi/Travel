@@ -27,9 +27,8 @@ public class CreateWalletCommandHandler(
         // ایجاد کیف پول جدید
         var wallet = new WalletPayment.Domain.Entities.Wallet.Wallet(request.UserId);
 
-        // ایجاد حساب پیش‌فرض با ارز ریال
-        string defaultAccountNumber = GenerateAccountNumber();
-        var defaultAccount = wallet.CreateAccount(CurrencyCode.IRR, defaultAccountNumber);
+        // ایجاد حساب پیش‌فرض با ارز ریال        
+        var defaultAccount = wallet.CreateAccount(CurrencyCode.IRR);
 
         // ذخیره در دیتابیس
         await walletRepository.AddAsync(wallet, cancellationToken);

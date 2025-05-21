@@ -15,15 +15,15 @@ public class GetAccountBalanceHistoryQueryHandler(
     public async Task<AccountBalanceHistoryResponse> Handle(GetAccountBalanceHistoryQuery request, CancellationToken cancellationToken)
     {
         // دریافت اطلاعات حساب
-        var account = await dbContext.Accounts
-            .FirstOrDefaultAsync(a => a.Id == request.AccountId, cancellationToken);
+        var currencyAccount = await dbContext.CurrencyAccount
+            .FirstOrDefaultAsync(a => a.Id == request.CurrencyAccountId, cancellationToken);
 
-        if (account == null)
-            throw new NotFoundException("حساب مورد نظر یافت نشد", request.AccountId);
+        if (currencyAccount == null)
+            throw new NotFoundException("حساب مورد نظر یافت نشد", request.CurrencyAccountId);
 
         // دریافت اسنپ‌شات‌های حساب
         var snapshots = await snapshotService.GetAccountSnapshotsAsync(
-            request.AccountId,
+            request.CurrencyAccountId,
             request.StartDate,
             request.EndDate,
             request.SnapshotType,
@@ -78,10 +78,9 @@ public class GetAccountBalanceHistoryQueryHandler(
 
         return new AccountBalanceHistoryResponse
         {
-            AccountId = account.Id,
-            CurrencyAccountCode = account.CurrencyAccountCode, // نام فیلد نیز بروزرسانی شده است
-            Currency = account.Currency.ToString(),
-            CurrentBalance = account.Balance,
+            CurrencyAccountId = currencyAccount.Id,           
+            Currency = currencyAccount.Currency.ToString(),
+            CurrentBalance = currencyAccount.Balance,
             StartDate = request.StartDate,
             EndDate = request.EndDate,
             HistoryItems = historyItems

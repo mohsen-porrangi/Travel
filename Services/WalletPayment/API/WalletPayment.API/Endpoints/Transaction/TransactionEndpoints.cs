@@ -2,6 +2,7 @@
 using Carter;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using WalletPayment.Application.Common.Contracts;
 using WalletPayment.Application.Transactions.Queries.Common;
 using WalletPayment.Application.Transactions.Queries.GetAccountStatement;
 using WalletPayment.Application.Transactions.Queries.GetUserTransactionHistory;
@@ -14,24 +15,24 @@ public class TransactionEndpoints : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
 
-        app.MapGet("/wallets/{userId:guid}/transactions", async (
-          Guid userId,
-          ISender sender,
-          CancellationToken cancellationToken,
-          [FromQuery] int pageNumber = 1,
-          [FromQuery] int pageSize = 20,
-          [FromQuery] DateTime? startDate = null,
-          [FromQuery] DateTime? endDate = null,
-          [FromQuery] TransactionDirection? direction = null,
-          [FromQuery] Domain.Entities.Enums.TransactionType? type = null,
-          [FromQuery] TransactionStatus? status = null,
-          [FromQuery] CurrencyCode? currency = null,
-          [FromQuery] decimal? minAmount = null,
-          [FromQuery] decimal? maxAmount = null,
-          [FromQuery] bool? isCredit = null,
-          [FromQuery] string sortBy = "TransactionDate",
-          [FromQuery] bool sortDesc = true
-          ) =>
+        app.MapGet("/wallets/transactions", async (
+            [FromServices] ICurrentUserService currentUserService,
+            ISender sender,
+            CancellationToken cancellationToken,
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 20,
+            [FromQuery] DateTime? startDate = null,
+            [FromQuery] DateTime? endDate = null,
+            [FromQuery] TransactionDirection? direction = null,
+            [FromQuery] Domain.Entities.Enums.TransactionType? type = null,
+            [FromQuery] TransactionStatus? status = null,
+            [FromQuery] CurrencyCode? currency = null,
+            [FromQuery] decimal? minAmount = null,
+            [FromQuery] decimal? maxAmount = null,
+            [FromQuery] bool? isCredit = null,
+            [FromQuery] string sortBy = "TransactionDate",
+            [FromQuery] bool sortDesc = true
+            ) =>
         {
             var filter = new TransactionFilter
             {
@@ -48,7 +49,7 @@ public class TransactionEndpoints : ICarterModule
 
             var query = new GetUserTransactionHistoryQuery
             {
-                UserId = userId,
+                UserId = currentUserService.GetCurrentUserId(),
                 PageNumber = pageNumber,
                 PageSize = pageSize,
                 Filter = filter,
@@ -62,8 +63,8 @@ public class TransactionEndpoints : ICarterModule
       .WithTags("Transactions")
       .RequireAuthorization();
 
-        app.MapGet("/wallets/{userId:guid}/statement", async (
-            Guid userId,
+        app.MapGet("/wallets/statement", async (
+            [FromServices] ICurrentUserService currentUserService,
             ISender sender,
             CancellationToken cancellationToken,
             [FromQuery] CurrencyCode currency = CurrencyCode.IRR,
@@ -73,7 +74,7 @@ public class TransactionEndpoints : ICarterModule
         {
             var query = new GetAccountStatementQuery
             {
-                UserId = userId,
+                UserId = currentUserService.GetCurrentUserId(),
                 Currency = currency,
                 StartDate = startDate ?? DateTime.UtcNow.AddMonths(-1),
                 EndDate = endDate ?? DateTime.UtcNow
@@ -85,12 +86,12 @@ public class TransactionEndpoints : ICarterModule
         .WithTags("Transactions")
         .RequireAuthorization();
 
-        app.MapGet("/wallets/{userId:guid}/summary", async (
-            Guid userId,
+        app.MapGet("/wallets/summary", async (
+            [FromServices] ICurrentUserService currentUserService,
             ISender sender,
             CancellationToken cancellationToken = default) =>
         {
-            var result = await sender.Send(new GetWalletSummaryQuery(userId), cancellationToken);
+            var result = await sender.Send(new GetWalletSummaryQuery(currentUserService.GetCurrentUserId()), cancellationToken);
             return Results.Ok(result);
         })
         .WithTags("Wallets")

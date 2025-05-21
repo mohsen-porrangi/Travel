@@ -3,7 +3,7 @@ using WalletPayment.Domain.Entities.Enums;
 
 namespace WalletPayment.Domain.Entities.Credit;
 
-public class CreditHistory : EntityWithDomainEvents
+public class CreditHistory : EntityWithDomainEvents<long>
 {
     public Guid WalletId { get; private set; }
     public decimal Amount { get; private set; }
@@ -24,8 +24,7 @@ public class CreditHistory : EntityWithDomainEvents
         Guid? settlementTransactionId,
         CreditStatus status,
         string description)
-    {
-        Id = Guid.NewGuid();
+    {        
         WalletId = walletId;
         Amount = amount;
         GrantDate = grantDate;

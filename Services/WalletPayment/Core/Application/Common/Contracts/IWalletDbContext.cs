@@ -12,7 +12,7 @@ namespace WalletPayment.Application.Common.Contracts;
 public interface IWalletDbContext
 {
     DbSet<Domain.Entities.Wallet.Wallet> Wallets { get; }
-    DbSet<CurrencyAccount> Accounts { get; }
+    DbSet<CurrencyAccount> CurrencyAccount { get; }
     DbSet<Transaction> Transactions { get; }
     DbSet<CurrencyAccountBalanceSnapshot> AccountBalanceSnapshots { get; }
     DbSet<PaymentTransaction> PaymentTransactions { get; }

@@ -22,12 +22,12 @@ public class GetWalletSummaryQueryHandler(
         wallet.CheckCreditDueDate();
 
         // خلاصه حساب‌ها
-        var accountSummaries = wallet.Accounts
+        var accountSummaries = wallet.CurrencyAccount
             .Where(a => !a.IsDeleted)
             .Select(a => new AccountSummaryDto
             {
                 AccountId = a.Id,
-                AccountNumber = a.AccountNumber,
+                CurrencyAccountId = a.Id,
                 Currency = a.Currency,
                 Balance = a.Balance,
                 IsActive = a.IsActive

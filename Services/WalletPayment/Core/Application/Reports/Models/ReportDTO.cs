@@ -43,8 +43,7 @@ public record AccountStatementData
 /// </summary>
 public record AccountSummaryDto
 {
-    public Guid AccountId { get; init; }
-    public string AccountNumber { get; init; }
+    public Guid AccountId { get; init; }    
     public CurrencyCode Currency { get; init; }
     public decimal Balance { get; init; }
     public bool IsActive { get; init; }

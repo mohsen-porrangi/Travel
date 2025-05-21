@@ -4,7 +4,7 @@ using WalletPayment.Domain.Entities.Account;
 using WalletPayment.Domain.Entities.Enums;
 
 namespace Domain.Entities.Account;
-public class CurrencyAccountBalanceSnapshot : EntityWithDomainEvents, ISoftDelete
+public class CurrencyAccountBalanceSnapshot : EntityWithDomainEvents<long>, ISoftDelete
 {
     public Guid AccountInfoId { get; private set; }
     public decimal Balance { get; private set; }
@@ -18,8 +18,7 @@ public class CurrencyAccountBalanceSnapshot : EntityWithDomainEvents, ISoftDelet
 
     
     public CurrencyAccountBalanceSnapshot(Guid accountInfoId, decimal balance, SnapshotType type)
-    {
-        Id = Guid.NewGuid();
+    {        
         AccountInfoId = accountInfoId;
         Balance = balance;
         SnapshotDate = DateTime.UtcNow;

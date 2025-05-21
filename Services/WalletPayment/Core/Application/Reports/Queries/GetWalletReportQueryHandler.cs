@@ -155,10 +155,10 @@ public class GetWalletReportQueryHandler : IQueryHandler<GetWalletReportQuery, W
         CancellationToken cancellationToken)
     {
         // یافتن حساب با ارز درخواستی
-        var account = (await _walletRepository.GetByIdAsync(walletId, cancellationToken))
-            .Accounts.FirstOrDefault(a => a.Currency == displayCurrency);
+        var currencyAccount = (await _walletRepository.GetByIdAsync(walletId, cancellationToken))
+            .CurrencyAccount.FirstOrDefault(a => a.Currency == displayCurrency);
 
-        if (account == null)
+        if (currencyAccount == null)
             throw new NotFoundException($"حساب با ارز {displayCurrency} برای کاربر یافت نشد", walletId);
 
         // تعیین بازه زمانی
@@ -167,14 +167,14 @@ public class GetWalletReportQueryHandler : IQueryHandler<GetWalletReportQuery, W
 
         // محاسبه موجودی ابتدایی (قبل از شروع بازه گزارش)
         var openingBalanceTransactions = await _dbContext.Transactions
-            .Where(t => t.AccountInfoId == account.Id && t.TransactionDate < startDate)
+            .Where(t => t.AccountInfoId == currencyAccount.Id && t.TransactionDate < startDate)
             .ToListAsync(cancellationToken);
 
         decimal openingBalance = CalculateBalance(openingBalanceTransactions);
 
         // دریافت تراکنش‌های بازه زمانی
         var periodTransactions = await _dbContext.Transactions
-            .Where(t => t.AccountInfoId == account.Id &&
+            .Where(t => t.AccountInfoId == currencyAccount.Id &&
                   t.TransactionDate >= startDate &&
                   t.TransactionDate <= endDate)
             .OrderBy(t => t.TransactionDate)
@@ -280,12 +280,11 @@ public class GetWalletReportQueryHandler : IQueryHandler<GetWalletReportQuery, W
         wallet.CheckCreditDueDate();
 
         // خلاصه حساب‌ها
-        var accountSummaries = wallet.Accounts
+        var currencyAccountSummaries = wallet.CurrencyAccount
             .Where(a => !a.IsDeleted)
             .Select(a => new AccountSummaryDto
             {
-                AccountId = a.Id,
-                AccountNumber = a.CurrencyAccountCode,
+                AccountId = a.Id,                
                 Currency = a.Currency,
                 Balance = a.Balance,
                 IsActive = a.IsActive
@@ -334,7 +333,7 @@ public class GetWalletReportQueryHandler : IQueryHandler<GetWalletReportQuery, W
 
         // محاسبه موجودی کل در ارز نمایشی
         decimal totalBalance = 0;
-        foreach (var account in wallet.Accounts.Where(a => a.IsActive && !a.IsDeleted))
+        foreach (var account in wallet.CurrencyAccount.Where(a => a.IsActive && !a.IsDeleted))
         {
             if (account.Currency == displayCurrency)
             {
@@ -351,8 +350,8 @@ public class GetWalletReportQueryHandler : IQueryHandler<GetWalletReportQuery, W
         {
             WalletId = wallet.Id,
             IsActive = wallet.IsActive,
-            TotalAccounts = accountSummaries.Count,
-            Accounts = accountSummaries,
+            TotalAccounts = currencyAccountSummaries.Count,
+            Accounts = currencyAccountSummaries,
             Credit = creditSummary,
             Transactions = transactionSummary,
             TotalBalance = totalBalance,

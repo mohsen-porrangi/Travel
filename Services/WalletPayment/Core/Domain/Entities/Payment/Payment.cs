@@ -5,7 +5,7 @@ using WalletPayment.Domain.Entities.Enums;
 
 namespace WalletPayment.Domain.Entities.Payment;
 
-public class Payment : EntityWithDomainEvents, ISoftDelete
+public class Payment : EntityWithDomainEvents<Guid>, ISoftDelete
 {
     public Guid WalletId { get; private set; }
     public Guid? AccountInfoId { get; private set; }  // اختیاری - در پرداخت‌های مستقیم خالی است

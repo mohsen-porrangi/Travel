@@ -4,10 +4,9 @@ using WalletPayment.Domain.Entities.Enums;
 using static Domain.Domain.Events.WalletDepositedEvent;
 
 namespace WalletPayment.Domain.Entities.Account;
-public class CurrencyAccount : EntityWithDomainEvents
+public class CurrencyAccount : EntityWithDomainEvents<Guid>
 {
-    public Guid WalletId { get; private set; }
-    public string CurrencyAccountCode { get; private set; }
+    public Guid WalletId { get; private set; }    
     public CurrencyCode Currency { get; private set; }
     public decimal Balance { get; private set; }
     public bool IsActive { get; private set; }
@@ -19,11 +18,9 @@ public class CurrencyAccount : EntityWithDomainEvents
     
     private CurrencyAccount() { }
 
-    public CurrencyAccount(Guid walletId, CurrencyCode currency, string currencyAccountCode)
-    {
-        Id = Guid.NewGuid();
-        WalletId = walletId;
-        CurrencyAccountCode = currencyAccountCode;
+    public CurrencyAccount(Guid walletId, CurrencyCode currency)
+    {        
+        WalletId = walletId;        
         Currency = currency;
         Balance = 0;
         IsActive = true;

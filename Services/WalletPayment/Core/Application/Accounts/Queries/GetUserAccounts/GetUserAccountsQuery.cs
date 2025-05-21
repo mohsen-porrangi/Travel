@@ -9,13 +9,12 @@ public record UserAccountsResponse
 {
     public Guid WalletId { get; init; }
     public int TotalAccounts { get; init; }
-    public List<AccountDto> Accounts { get; init; } = new();
+    public List<CurrencyAccountDto> Accounts { get; init; } = new();
 }
 
-public record AccountDto
+public record CurrencyAccountDto
 {
-    public Guid Id { get; init; }
-    public string AccountNumber { get; init; }
+    public Guid Id { get; init; }    
     public CurrencyCode Currency { get; init; }
     public decimal Balance { get; init; }
     public bool IsActive { get; init; }

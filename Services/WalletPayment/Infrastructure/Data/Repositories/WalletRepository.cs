@@ -17,14 +17,14 @@ public class WalletRepository : IWalletRepository
     public async Task<Wallet?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         return await _dbContext.Wallets
-            .Include(w => w.Accounts)
+            .Include(w => w.CurrencyAccount)
             .FirstOrDefaultAsync(w => w.Id == id, cancellationToken);
     }
 
     public async Task<Wallet?> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
     {
         return await _dbContext.Wallets
-            .Include(w => w.Accounts)
+            .Include(w => w.CurrencyAccount)
             .FirstOrDefaultAsync(w => w.UserId == userId, cancellationToken);
     }
 
@@ -46,7 +46,7 @@ public class WalletRepository : IWalletRepository
     public async Task<Wallet?> GetByUserIdWithCreditHistoryAsync(Guid userId, CancellationToken cancellationToken = default)
     {
         return await _dbContext.Wallets
-            .Include(w => w.Accounts)
+            .Include(w => w.CurrencyAccount)
             .Include(w => w.CreditHistory)
             .FirstOrDefaultAsync(w => w.UserId == userId, cancellationToken);
     }

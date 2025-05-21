@@ -20,31 +20,31 @@ namespace Infrastructure.Services
 
         public async Task CreateSnapshotAsync(Guid accountId, SnapshotType type, CancellationToken cancellationToken = default)
         {
-            var account = await _dbContext.Accounts
+            var currencyAccount = await _dbContext.CurrencyAccount
                 .FirstOrDefaultAsync(a => a.Id == accountId && a.IsActive, cancellationToken);
 
-            if (account == null)
+            if (currencyAccount == null)
             {
                 _logger.LogWarning("تلاش برای ایجاد اسنپ‌شات حساب ناموجود یا غیرفعال: {AccountId}", accountId);
                 return;
             }
 
-            var snapshot = new CurrencyAccountBalanceSnapshot(accountId, account.Balance, type);
+            var snapshot = new CurrencyAccountBalanceSnapshot(accountId, currencyAccount.Balance, type);
             await _dbContext.AccountBalanceSnapshots.AddAsync(snapshot, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);
 
             _logger.LogInformation(
                 "اسنپ‌شات با موفقیت برای حساب {AccountId} ایجاد شد. موجودی: {Balance}, نوع: {Type}",
-                accountId, account.Balance, type);
+                accountId, currencyAccount.Balance, type);
         }
 
         public async Task CreateSnapshotsForAllAccountsAsync(SnapshotType type, CancellationToken cancellationToken = default)
         {
-            var activeAccounts = await _dbContext.Accounts
+            var activeCurrencyAccounts = await _dbContext.CurrencyAccount
                 .Where(a => a.IsActive && !a.IsDeleted)
                 .ToListAsync(cancellationToken);
 
-            var snapshots = activeAccounts.Select(account =>
+            var snapshots = activeCurrencyAccounts.Select(account =>
                 new CurrencyAccountBalanceSnapshot(account.Id, account.Balance, type)).ToList();
 
             await _dbContext.AccountBalanceSnapshots.AddRangeAsync(snapshots, cancellationToken);
@@ -52,7 +52,7 @@ namespace Infrastructure.Services
 
             _logger.LogInformation(
                 "اسنپ‌شات با موفقیت برای {Count} حساب فعال ایجاد شد. نوع: {Type}",
-                activeAccounts.Count, type);
+                activeCurrencyAccounts.Count, type);
         }
 
         public async Task<IEnumerable<CurrencyAccountBalanceSnapshot>> GetAccountSnapshotsAsync(

@@ -4,7 +4,7 @@ using WalletPayment.Domain.Entities.Enums;
 namespace WalletPayment.Application.Accounts.Queries.GetAccountBalanceHistory;
 
 public record GetAccountBalanceHistoryQuery(
-    Guid AccountId,
+    Guid CurrencyAccountId,
     DateTime StartDate,
     DateTime EndDate,
     SnapshotType? SnapshotType,
@@ -12,7 +12,7 @@ public record GetAccountBalanceHistoryQuery(
 
 public record AccountBalanceHistoryResponse
 {
-    public Guid AccountId { get; init; }
+    public Guid CurrencyAccountId { get; init; }
     public string CurrencyAccountCode { get; init; } 
     public string Currency { get; init; }
     public decimal CurrentBalance { get; init; }

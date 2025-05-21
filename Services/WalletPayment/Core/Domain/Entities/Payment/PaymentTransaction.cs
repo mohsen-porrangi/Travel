@@ -4,7 +4,7 @@ using WalletPayment.Domain.Entities.Enums;
 
 namespace Domain.Entities.Payment;
 
-public class PaymentTransaction : EntityWithDomainEvents, ISoftDelete
+public class PaymentTransaction : EntityWithDomainEvents<Guid>, ISoftDelete
 {
     public Guid UserId { get; private set; }
     public decimal Amount { get; private set; }

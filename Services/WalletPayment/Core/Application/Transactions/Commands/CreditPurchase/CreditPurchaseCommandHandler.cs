@@ -30,11 +30,10 @@ public class CreditPurchaseCommandHandler(
             throw new BadRequestException($"اعتبار کافی نیست. اعتبار موجود: {wallet.CreditBalance}، مبلغ درخواستی: {request.Amount}");
 
         // پیدا کردن حساب متناسب با ارز درخواستی یا ایجاد حساب جدید
-        var account = wallet.Accounts.FirstOrDefault(a => a.Currency == request.Currency && a.IsActive);
-        if (account == null)
-        {
-            string accountNumber = GenerateAccountNumber();
-            account = wallet.CreateAccount(request.Currency, accountNumber);
+        var currencyAccount = wallet.CurrencyAccount.FirstOrDefault(a => a.Currency == request.Currency && a.IsActive);
+        if (currencyAccount == null)
+        {            
+            currencyAccount = wallet.CreateAccount(request.Currency);
         }
 
         // استفاده از اعتبار
@@ -44,7 +43,7 @@ public class CreditPurchaseCommandHandler(
 
         // ایجاد تراکنش
         var transaction = new Domain.Entities.Transaction.Transaction(
-            account.Id,
+            currencyAccount.Id,
             wallet.Id,
             request.Amount,
             TransactionDirection.Out,
@@ -72,10 +71,5 @@ public class CreditPurchaseCommandHandler(
             transaction.TransactionDate
         );
     }
-
-    private string GenerateAccountNumber()
-    {
-        // ساخت شماره حساب تصادفی 16 رقمی
-        return $"6037{new Random().Next(100000000, 999999999).ToString().PadRight(12, '0')}";
-    }
+ 
 }

@@ -17,12 +17,13 @@ public class WalletDbContext : DbContext, IWalletDbContext
     public WalletDbContext(DbContextOptions<WalletDbContext> options) : base(options) { }
 
     public DbSet<Wallet> Wallets => Set<Wallet>();
-    public DbSet<CurrencyAccount> Accounts => Set<CurrencyAccount>();
+    public DbSet<CurrencyAccount> CurrencyAccount => Set<CurrencyAccount>();
     public DbSet<Transaction> Transactions => Set<Transaction>();
     public DbSet<CurrencyAccountBalanceSnapshot> AccountBalanceSnapshots => Set<CurrencyAccountBalanceSnapshot>();
     public DbSet<PaymentTransaction> PaymentTransactions => Set<PaymentTransaction>();
     public DbSet<Payment> Payments => Set<Payment>();
     public DbSet<BankAccount> BankAccounts => Set<BankAccount>();
+   
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

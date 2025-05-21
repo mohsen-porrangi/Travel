@@ -3,7 +3,7 @@ using System;
 
 namespace WalletPayment.Domain.Entities.BankAccount;
 
-public class BankAccount : EntityWithDomainEvents
+public class BankAccount : EntityWithDomainEvents<Guid>
 {
     public Guid UserId { get; private set; }
     public string BankName { get; private set; }
@@ -26,8 +26,7 @@ public class BankAccount : EntityWithDomainEvents
         string cardNumber,
         string shabaNumber,
         string accountHolderName)
-    {
-        Id = Guid.NewGuid();
+    {        
         UserId = userId;
         BankName = bankName;
         AccountNumber = accountNumber;

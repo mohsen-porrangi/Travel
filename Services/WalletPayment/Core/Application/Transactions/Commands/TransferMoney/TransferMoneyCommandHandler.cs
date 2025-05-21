@@ -33,17 +33,16 @@ public class TransferMoneyCommandHandler(
             throw new BadRequestException("کیف پول مقصد غیرفعال است");
 
         // پیدا کردن/ایجاد حساب مبدأ
-        var sourceAccount = sourceWallet.Accounts.FirstOrDefault(a => a.Currency == request.Currency && a.IsActive);
+        var sourceAccount = sourceWallet.CurrencyAccount.FirstOrDefault(a => a.Currency == request.Currency && a.IsActive);
         if (sourceAccount == null)
             throw new BadRequestException($"حساب مبدأ با ارز {request.Currency} یافت نشد");
 
         // پیدا کردن/ایجاد حساب مقصد
-        var targetAccount = targetWallet.Accounts.FirstOrDefault(a => a.Currency == request.Currency && a.IsActive);
+        var targetAccount = targetWallet.CurrencyAccount.FirstOrDefault(a => a.Currency == request.Currency && a.IsActive);
         if (targetAccount == null)
         {
-            // ایجاد خودکار حساب با ارز مناسب در مقصد
-            string accountNumber = GenerateAccountNumber();
-            targetAccount = targetWallet.CreateAccount(request.Currency, accountNumber);
+            // ایجاد خودکار حساب با ارز مناسب در مقصد           
+            targetAccount = targetWallet.CreateAccount(request.Currency);
         }
 
         // محاسبه کارمزد انتقال
@@ -125,11 +124,5 @@ public class TransferMoneyCommandHandler(
             await unitOfWork.RollbackTransactionAsync(cancellationToken);
             throw;
         }
-    }
-
-    private string GenerateAccountNumber()
-    {
-        // ساخت شماره حساب تصادفی 16 رقمی
-        return $"6037{new Random().Next(100000000, 999999999).ToString().PadRight(12, '0')}";
     }
 }

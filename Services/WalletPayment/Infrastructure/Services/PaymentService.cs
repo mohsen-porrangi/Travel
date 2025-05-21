@@ -204,16 +204,15 @@ public class PaymentService : IPaymentService
                         if (wallet != null)
                         {
                             // پیدا کردن یا ایجاد حساب متناسب با ارز
-                            var account = wallet.Accounts.FirstOrDefault(a => a.Currency == payment.Currency && a.IsActive);
-                            if (account == null)
+                            var currencyAccount = wallet.CurrencyAccount.FirstOrDefault(a => a.Currency == payment.Currency && a.IsActive);
+                            if (currencyAccount == null)
                             {
-                                // ایجاد حساب جدید
-                                var accountNumber = GenerateAccountNumber();
-                                account = wallet.CreateAccount(payment.Currency, accountNumber);
+                                // ایجاد حساب جدید                                
+                                currencyAccount = wallet.CreateAccount(payment.Currency);
                             }
 
                             // شارژ حساب
-                            var transaction = account.Deposit(
+                            var transaction = currencyAccount.Deposit(
                                 payment.Amount,
                                 $"شارژ مستقیم از درگاه {payment.GatewayType} - {payment.Description}",
                                 result.ReferenceId);
@@ -359,13 +358,13 @@ public class PaymentService : IPaymentService
                         try
                         {
                             // پیدا کردن حساب
-                            var account = await _dbContext.Accounts
+                            var currencyAccount = await _dbContext.CurrencyAccount
                                 .FirstOrDefaultAsync(a => a.Id == transaction.AccountInfoId, cancellationToken);
 
-                            if (account != null && account.IsActive)
+                            if (currencyAccount != null && currencyAccount.IsActive)
                             {
                                 // برداشت معادل مبلغ استرداد از حساب
-                                var withdrawTransaction = account.Withdraw(
+                                var withdrawTransaction = currencyAccount.Withdraw(
                                     refundAmount,
                                     TransactionType.Refund,
                                     $"برگشت وجه بابت استرداد پرداخت - {reason}",

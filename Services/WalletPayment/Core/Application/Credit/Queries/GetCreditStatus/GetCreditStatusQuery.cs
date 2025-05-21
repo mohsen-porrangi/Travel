@@ -15,7 +15,7 @@ public record CreditStatusResponse(
     ICollection<CreditHistoryDto> CreditHistory);
 
 public record CreditHistoryDto(
-    Guid Id,
+    long Id,
     decimal Amount,
     DateTime GrantDate,
     DateTime DueDate,
