@@ -1,4 +1,5 @@
-﻿using BuildingBlocks.Utils;
+﻿// فایل: Services/UserManagement/UserManagement.API/Endpoints/Profile/EditCurrentUser/EditCurrentUserCommandValidator.cs
+using BuildingBlocks.Utils;
 
 namespace UserManagement.API.Endpoints.Profile.EditCurrentUser;
 
@@ -28,5 +29,16 @@ public class EditCurrentUserCommandValidator : AbstractValidator<EditCurrentUser
 
         RuleFor(x => x.BirthDate)
             .LessThanOrEqualTo(DateTime.Today).WithMessage("تاریخ تولد نمی‌تواند در آینده باشد.");
+
+        // اعتبارسنجی فیلدهای تغییر رمز عبور
+        When(x => !string.IsNullOrEmpty(x.CurrentPassword) || !string.IsNullOrEmpty(x.NewPassword), () => {
+            RuleFor(x => x.CurrentPassword)
+                .NotEmpty().WithMessage("رمز عبور فعلی الزامی است.");
+
+            RuleFor(x => x.NewPassword)
+                .NotEmpty().WithMessage("رمز عبور جدید الزامی است.")
+                .MinimumLength(6).WithMessage("رمز عبور جدید باید حداقل ۶ کاراکتر باشد.")
+                .NotEqual(x => x.CurrentPassword).WithMessage("رمز عبور جدید نباید با رمز فعلی یکسان باشد.");
+        });
     }
 }

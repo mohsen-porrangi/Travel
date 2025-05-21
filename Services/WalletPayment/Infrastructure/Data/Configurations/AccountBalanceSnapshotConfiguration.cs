@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Data.Configurations
 {
-    public class AccountBalanceSnapshotConfiguration : IEntityTypeConfiguration<AccountBalanceSnapshot>
+    public class AccountBalanceSnapshotConfiguration : IEntityTypeConfiguration<CurrencyAccountBalanceSnapshot>
     {
-        public void Configure(EntityTypeBuilder<AccountBalanceSnapshot> builder)
+        public void Configure(EntityTypeBuilder<CurrencyAccountBalanceSnapshot> builder)
         {
             builder.HasKey(s => s.Id);
 

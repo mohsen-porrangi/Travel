@@ -14,10 +14,10 @@ public class Wallet : EntityWithDomainEvents, IAggregateRoot, ISoftDelete
     public decimal CreditBalance { get; private set; }
     public DateTime? CreditDueDate { get; private set; }
 
-    private readonly List<AccountInfo> _accounts = new();
+    private readonly List<CurrencyAccount> _accounts = new();
     private readonly List<CreditHistory> _creditHistory = new();
     public IReadOnlyCollection<CreditHistory> CreditHistory => _creditHistory.AsReadOnly();
-    public IReadOnlyCollection<AccountInfo> Accounts => _accounts.AsReadOnly();
+    public IReadOnlyCollection<CurrencyAccount> Accounts => _accounts.AsReadOnly();
 
     // کانستراکتور خصوصی برای EF Core
     private Wallet() { }
@@ -38,12 +38,12 @@ public class Wallet : EntityWithDomainEvents, IAggregateRoot, ISoftDelete
         AddDomainEvent(new WalletCreatedEvent(Id, userId));
     }
     // ایجاد یک حساب جدید برای ارز مشخص
-    public AccountInfo CreateAccount(CurrencyCode currency, string accountNumber)
+    public CurrencyAccount CreateAccount(CurrencyCode currency, string accountNumber)
     {
         if (_accounts.Any(a => a.Currency == currency && !a.IsDeleted))
             throw new InvalidOperationException($"حساب با ارز {currency} قبلاً برای این کیف پول ایجاد شده است");
 
-        var account = new AccountInfo(this.Id, currency, accountNumber);
+        var account = new CurrencyAccount(this.Id, currency, accountNumber);
         _accounts.Add(account);
 
         UpdatedAt = DateTime.UtcNow;

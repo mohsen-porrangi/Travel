@@ -1,8 +1,16 @@
-﻿namespace UserManagement.API.Endpoints.Auth.Login;
+﻿// فایل: Services/UserManagement/UserManagement.API/Endpoints/Auth/Login/LoginUserDto.cs
+namespace UserManagement.API.Endpoints.Auth.Login;
 
 public record LoginUserCommand(
-   // string? Email,
+    //string? Email,
     string? Mobile,
     string? Password,
     string? Otp
-) : ICommand<string>;
+) : ICommand<LoginResult>;
+
+public record LoginResult(
+    bool Success,
+    string? Token = null,
+    string? Message = null,
+    string? NextStep = null
+);

@@ -38,10 +38,4 @@ public class CreateWalletCommandHandler(
         // بازگرداندن اطلاعات
         return new CreateWalletResponse(wallet.Id, defaultAccount.Id);
     }
-
-    private string GenerateAccountNumber()
-    {
-        // ساخت شماره حساب تصادفی 16 رقمی
-        return $"6037{new Random().Next(100000000, 999999999).ToString().PadRight(12, '0')}";
-    }
 }

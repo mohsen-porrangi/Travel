@@ -19,8 +19,13 @@ namespace UserManagement.API.Endpoints.Profile.EditCurrentUser
                 await sender.Send(fullCommand, ct);
                 return Results.NoContent();
             })
-            .WithTags("Profile")
-            .RequireAuthorization();
+                .WithName("EditUserProfile")
+                .WithDescription("ویرایش اطلاعات پروفایل کاربر و تغییر رمز عبور")
+                .Produces(StatusCodes.Status204NoContent)
+                .Produces(StatusCodes.Status401Unauthorized)
+                .ProducesProblem(StatusCodes.Status400BadRequest)
+                .WithTags("Profile")
+                .RequireAuthorization();
         }
     }
 }

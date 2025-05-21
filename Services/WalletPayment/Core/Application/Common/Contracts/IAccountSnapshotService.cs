@@ -23,7 +23,7 @@ namespace Application.Common.Contracts
         /// <summary>
         /// دریافت تاریخچه اسنپ‌شات‌های یک حساب
         /// </summary>
-        Task<IEnumerable<AccountBalanceSnapshot>> GetAccountSnapshotsAsync(
+        Task<IEnumerable<CurrencyAccountBalanceSnapshot>> GetAccountSnapshotsAsync(
             Guid accountId,
             DateTime? startDate = null,
             DateTime? endDate = null,
@@ -33,7 +33,7 @@ namespace Application.Common.Contracts
         /// <summary>
         /// دریافت آخرین اسنپ‌شات حساب
         /// </summary>
-        Task<AccountBalanceSnapshot?> GetLastSnapshotAsync(
+        Task<CurrencyAccountBalanceSnapshot?> GetLastSnapshotAsync(
             Guid accountId,
             SnapshotType? type = null,
             CancellationToken cancellationToken = default);

@@ -12,7 +12,11 @@ public class RegisterUserEndpoint : ICarterModule
             await sender.Send(command, ct);
             return Results.NoContent();
         })
-        .WithTags("Auth")
-        .AllowAnonymous();
+            .WithTags("Auth")
+            .WithName("UserRegister")
+            .WithDescription("ثبت‌نام کاربر جدید با شماره موبایل و رمز عبور")
+            .Produces(StatusCodes.Status204NoContent)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .AllowAnonymous();
     }
 }

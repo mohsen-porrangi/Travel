@@ -9,7 +9,9 @@ public record IntegratedPurchaseCommand(
     CurrencyCode Currency,
     string OrderId,
     string Description,
-    string PaymentReferenceId) : ICommand<IntegratedPurchaseResponse>;
+    string PaymentReferenceId,
+    bool AutoConvertCurrency = true) // پارامتر جدید برای تبدیل خودکار ارز
+    : ICommand<IntegratedPurchaseResponse>;
 
 public record IntegratedPurchaseResponse(
     Guid DepositTransactionId,

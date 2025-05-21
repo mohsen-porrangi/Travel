@@ -9,6 +9,7 @@ public class OtpService : IOtpService
     {
         
         var simulatedOtp = "111111";
+        OtpStore[mobile] = simulatedOtp;
         Console.WriteLine($"[OTP TEST MODE] Sending OTP {simulatedOtp} to {mobile}");
         return Task.CompletedTask;
 

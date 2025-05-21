@@ -240,10 +240,9 @@ namespace UserManagement.API.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Family")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Gender")
+                    b.Property<int?>("Gender")
                         .HasColumnType("int");
 
                     b.Property<Guid>("IdentityId")
@@ -255,15 +254,10 @@ namespace UserManagement.API.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<Guid>("MasterIdentityId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NationalCode")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("UpdatedAt")
@@ -273,8 +267,6 @@ namespace UserManagement.API.Migrations
 
                     b.HasIndex("IdentityId")
                         .IsUnique();
-
-                    b.HasIndex("MasterIdentityId");
 
                     b.ToTable("Users");
                 });
@@ -338,16 +330,10 @@ namespace UserManagement.API.Migrations
 
             modelBuilder.Entity("UserManagement.API.Infrastructure.Data.Models.User", b =>
                 {
-                    b.HasOne("UserManagement.API.Infrastructure.Data.Models.MasterIdentity", null)
+                    b.HasOne("UserManagement.API.Infrastructure.Data.Models.MasterIdentity", "MasterIdentity")
                         .WithOne()
                         .HasForeignKey("UserManagement.API.Infrastructure.Data.Models.User", "IdentityId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("UserManagement.API.Infrastructure.Data.Models.MasterIdentity", "MasterIdentity")
-                        .WithMany()
-                        .HasForeignKey("MasterIdentityId")
-                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("MasterIdentity");

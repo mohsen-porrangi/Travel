@@ -12,8 +12,13 @@ namespace UserManagement.API.Endpoints.Users.GetUsers
                 var result = await sender.Send(new GetAllUsersQuery(), ct);
                 return Results.Ok(result);
             })
-            .WithTags("Users")
-            .RequireAuthorization("Admin");
+             .WithName("ListAllUsers")
+.WithDescription("دریافت لیست تمام کاربران")
+.Produces<GetAllUsersResult>(StatusCodes.Status200OK)
+.Produces(StatusCodes.Status401Unauthorized)
+.Produces(StatusCodes.Status403Forbidden)
+                .WithTags("Users")
+                .RequireAuthorization("Admin");
         }
     }
 }

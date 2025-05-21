@@ -15,8 +15,14 @@ namespace UserManagement.API.Endpoints.Users.DeleteUser
                 await sender.Send(new DeleteUserCommand(id), ct);
                 return Results.NoContent();
             })
-            .WithTags("Users")
-            .RequireAuthorization("Admin");
+             .WithName("RemoveUser")
+.WithDescription("حذف کاربر")
+.Produces(StatusCodes.Status204NoContent)
+.Produces(StatusCodes.Status401Unauthorized)
+.Produces(StatusCodes.Status403Forbidden)
+.ProducesProblem(StatusCodes.Status404NotFound)
+                .WithTags("Users")
+                .RequireAuthorization("Admin");
         }
     }
 }

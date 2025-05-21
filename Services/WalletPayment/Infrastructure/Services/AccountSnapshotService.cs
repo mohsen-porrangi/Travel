@@ -29,7 +29,7 @@ namespace Infrastructure.Services
                 return;
             }
 
-            var snapshot = new AccountBalanceSnapshot(accountId, account.Balance, type);
+            var snapshot = new CurrencyAccountBalanceSnapshot(accountId, account.Balance, type);
             await _dbContext.AccountBalanceSnapshots.AddAsync(snapshot, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);
 
@@ -45,7 +45,7 @@ namespace Infrastructure.Services
                 .ToListAsync(cancellationToken);
 
             var snapshots = activeAccounts.Select(account =>
-                new AccountBalanceSnapshot(account.Id, account.Balance, type)).ToList();
+                new CurrencyAccountBalanceSnapshot(account.Id, account.Balance, type)).ToList();
 
             await _dbContext.AccountBalanceSnapshots.AddRangeAsync(snapshots, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);
@@ -55,7 +55,7 @@ namespace Infrastructure.Services
                 activeAccounts.Count, type);
         }
 
-        public async Task<IEnumerable<AccountBalanceSnapshot>> GetAccountSnapshotsAsync(
+        public async Task<IEnumerable<CurrencyAccountBalanceSnapshot>> GetAccountSnapshotsAsync(
             Guid accountId,
             DateTime? startDate = null,
             DateTime? endDate = null,
@@ -79,7 +79,7 @@ namespace Infrastructure.Services
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<AccountBalanceSnapshot?> GetLastSnapshotAsync(
+        public async Task<CurrencyAccountBalanceSnapshot?> GetLastSnapshotAsync(
             Guid accountId,
             SnapshotType? type = null,
             CancellationToken cancellationToken = default)

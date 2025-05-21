@@ -2,6 +2,7 @@
 
 namespace WalletPayment.Application.Transactions.Commands.RefundTransaction;
 
+// فایل: Services/WalletPayment/Core/Application/Transactions/Commands/RefundTransaction/RefundTransactionCommand.cs
 public record RefundTransactionCommand : ICommand<RefundTransactionResponse>
 {
     public Guid OriginalTransactionId { get; init; }

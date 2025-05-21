@@ -16,8 +16,12 @@ namespace UserManagement.API.Endpoints.Profile.GetCurrentUser
                 var result = await sender.Send(new GetCurrentUserQuery(identityId), ct);
                 return Results.Ok(result);
             })
-            .WithTags("Profile")
-            .RequireAuthorization();
+                .WithName("GetUserProfile")
+.WithDescription("دریافت اطلاعات پروفایل کاربر جاری")
+.Produces<GetCurrentUserResult>(StatusCodes.Status200OK)
+.Produces(StatusCodes.Status401Unauthorized)
+                .WithTags("Profile")
+                .RequireAuthorization();
         }
     }
 }

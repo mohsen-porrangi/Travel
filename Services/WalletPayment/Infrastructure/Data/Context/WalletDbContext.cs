@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using WalletPayment.Application.Common.Contracts;
 using WalletPayment.Domain.Entities.Account;
+using WalletPayment.Domain.Entities.BankAccount;
 using WalletPayment.Domain.Entities.Payment;
 using WalletPayment.Domain.Entities.Transaction;
 using WalletPayment.Domain.Entities.Wallet;
@@ -16,11 +17,12 @@ public class WalletDbContext : DbContext, IWalletDbContext
     public WalletDbContext(DbContextOptions<WalletDbContext> options) : base(options) { }
 
     public DbSet<Wallet> Wallets => Set<Wallet>();
-    public DbSet<AccountInfo> Accounts => Set<AccountInfo>();
+    public DbSet<CurrencyAccount> Accounts => Set<CurrencyAccount>();
     public DbSet<Transaction> Transactions => Set<Transaction>();
-    public DbSet<AccountBalanceSnapshot> AccountBalanceSnapshots => Set<AccountBalanceSnapshot>();
+    public DbSet<CurrencyAccountBalanceSnapshot> AccountBalanceSnapshots => Set<CurrencyAccountBalanceSnapshot>();
     public DbSet<PaymentTransaction> PaymentTransactions => Set<PaymentTransaction>();
     public DbSet<Payment> Payments => Set<Payment>();
+    public DbSet<BankAccount> BankAccounts => Set<BankAccount>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
