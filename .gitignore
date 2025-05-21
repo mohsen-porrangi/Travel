@@ -5,3 +5,4 @@ obj/
 .git/
 Migrations/
 .config/
+*.bat
