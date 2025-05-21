@@ -9,7 +9,7 @@ public class Transaction : EntityWithDomainEvents
     public Guid WalletId { get; private set; }
     public Guid AccountInfoId { get; private set; }
     public Guid? RelatedTransactionId { get; private set; }
-    // متد عمومی برای تنظیم RelatedTransactionId
+    
     public void SetRelatedTransactionId(Guid? relatedId)
     {
         RelatedTransactionId = relatedId;
@@ -32,15 +32,14 @@ public class Transaction : EntityWithDomainEvents
     public string PaymentReferenceId { get; private set; }
     public string OrderId { get; private set; }
 
-    // کانستراکتور خصوصی برای EF Core
+    
     private Transaction() { }
     public void SetStatus(WalletPayment.Domain.Entities.Enums.TransactionStatus status)
     {
         Status = status;
         UpdatedAt = DateTime.UtcNow;
     }
-
-    // کانستراکتور برای ایجاد تراکنش جدید
+  
     public Transaction(
         Guid accountInfoId,
         Guid walletId,
@@ -88,8 +87,7 @@ public class Transaction : EntityWithDomainEvents
     }
     
     public void LinkToTransfer(Guid transferId)
-    {
-        // استفاده از فیلد RelatedTransactionId برای ذخیره شناسه انتقال
+    {       
         RelatedTransactionId = transferId;
         UpdatedAt = DateTime.UtcNow;
     }

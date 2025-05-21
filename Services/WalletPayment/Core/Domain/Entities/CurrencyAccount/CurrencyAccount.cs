@@ -14,10 +14,9 @@ public class CurrencyAccount : EntityWithDomainEvents
     private readonly List<Transaction.Transaction> _transactions = new();
     public IReadOnlyCollection<Transaction.Transaction> Transactions => _transactions.AsReadOnly();
 
-    // کانستراکتور خصوصی برای EF Core
+    
     private CurrencyAccount() { }
 
-    // کانستراکتور برای ایجاد یک حساب جدید
     public CurrencyAccount(Guid walletId, CurrencyCode currency, string currencyAccountCode)
     {
         Id = Guid.NewGuid();

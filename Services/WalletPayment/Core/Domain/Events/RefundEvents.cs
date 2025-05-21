@@ -21,7 +21,6 @@ public record RefundInitiatedEvent : IntegrationEvent
         Reason = reason;
         Source = "WalletPayment";
     }
-
     public Guid OriginalTransactionId { get; }
     public Guid WalletId { get; }
     public Guid AccountId { get; }

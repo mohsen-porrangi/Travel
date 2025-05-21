@@ -19,10 +19,10 @@ public class Wallet : EntityWithDomainEvents, IAggregateRoot, ISoftDelete
     public IReadOnlyCollection<CreditHistory> CreditHistory => _creditHistory.AsReadOnly();
     public IReadOnlyCollection<CurrencyAccount> Accounts => _accounts.AsReadOnly();
 
-    // کانستراکتور خصوصی برای EF Core
+    
     private Wallet() { }
 
-    // کانستراکتور برای ایجاد یک کیف پول جدید
+
     public Wallet(Guid userId)
     {
         Id = Guid.NewGuid();
@@ -50,9 +50,7 @@ public class Wallet : EntityWithDomainEvents, IAggregateRoot, ISoftDelete
         AddDomainEvent(new AccountCreatedEvent(Id, account.Id, currency));
 
         return account;
-    }
-    // متدهای قبلی حفظ شوند، متدهای زیر اضافه شوند
-
+    }    
     // اختصاص اعتبار به کیف پول
     public void AssignCredit(decimal amount, DateTime dueDate, string description)
     {

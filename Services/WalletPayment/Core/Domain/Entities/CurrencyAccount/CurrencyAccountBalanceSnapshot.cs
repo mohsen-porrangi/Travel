@@ -11,13 +11,12 @@ public class CurrencyAccountBalanceSnapshot : EntityWithDomainEvents, ISoftDelet
     public DateTime SnapshotDate { get; private set; }
     public SnapshotType Type { get; private set; }
 
-    // Navigation property
     public CurrencyAccount Account { get; private set; }
 
-    // کانستراکتور خصوصی برای EF Core
+    
     private CurrencyAccountBalanceSnapshot() { }
 
-    // کانستراکتور اصلی
+    
     public CurrencyAccountBalanceSnapshot(Guid accountInfoId, decimal balance, SnapshotType type)
     {
         Id = Guid.NewGuid();

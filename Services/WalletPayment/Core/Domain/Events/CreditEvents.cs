@@ -12,7 +12,6 @@ public record CreditAssignedEvent : IntegrationEvent
         DueDate = dueDate;
         Source = "WalletPayment";
     }
-
     public Guid WalletId { get; }
     public Guid UserId { get; }
     public decimal Amount { get; }

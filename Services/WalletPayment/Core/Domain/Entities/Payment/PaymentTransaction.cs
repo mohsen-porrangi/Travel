@@ -17,11 +17,9 @@ public class PaymentTransaction : EntityWithDomainEvents, ISoftDelete
     public string? OrderId { get; private set; }
     public DateTime? CompletedAt { get; private set; }
     public Guid? WalletTransactionId { get; private set; }
-
-    // کانستراکتور خصوصی برای EF Core
+    
     private PaymentTransaction() { }
-
-    // کانستراکتور اصلی
+    
     public PaymentTransaction(
         Guid userId,
         decimal amount,

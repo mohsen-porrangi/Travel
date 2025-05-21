@@ -23,7 +23,6 @@ public record TransferInitiatedEvent : IntegrationEvent
         Description = description;
         Source = "WalletPayment";
     }
-
     public Guid SourceWalletId { get; }
     public Guid SourceAccountId { get; }
     public Guid TargetWalletId { get; }

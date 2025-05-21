@@ -30,10 +30,9 @@ public class Payment : EntityWithDomainEvents, ISoftDelete
     // Navigation properties
     public Transaction.Transaction? Transaction { get; private set; }
 
-    // کانستراکتور خصوصی برای EF Core
+    
     private Payment() { }
-
-    // کانستراکتور اصلی برای ایجاد پرداخت جدید
+     
     public Payment(
         Guid walletId,
         Guid? accountInfoId,

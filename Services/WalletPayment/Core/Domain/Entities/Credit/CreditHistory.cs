@@ -14,10 +14,8 @@ public class CreditHistory : EntityWithDomainEvents
     public CreditStatus Status { get; private set; }
     public string Description { get; private set; }
 
-    // کانستراکتور خصوصی برای EF Core
     private CreditHistory() { }
 
-    // کانستراکتور برای ایجاد سابقه اعتبار جدید
     public CreditHistory(
         Guid walletId,
         decimal amount,

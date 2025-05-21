@@ -14,7 +14,7 @@ public class BankAccount : EntityWithDomainEvents
     public bool IsVerified { get; private set; }
     public bool IsDefault { get; private set; }
 
-    // کانستراکتور خصوصی برای EF Core
+    
     private BankAccount() { }
 
     // کانستراکتور عمومی
