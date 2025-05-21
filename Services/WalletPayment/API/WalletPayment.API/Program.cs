@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using WalletPayment.API.Middleware;
 using WalletPayment.Infrastructure;
 using WalletPayment.Application;
+using WalletPayment.API.Services;
+using WalletPayment.Application.Common.Contracts;
 
 namespace WalletPayment.API
 {
@@ -14,7 +16,7 @@ namespace WalletPayment.API
         {
             var builder = WebApplication.CreateBuilder(args);
             var assembly = typeof(Program).Assembly;
-
+            builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
             // Health Checks
             builder.Services.AddHealthChecks()
                 .AddDbContextCheck<WalletPayment.Infrastructure.Data.Context.WalletDbContext>("Database");
@@ -49,6 +51,7 @@ namespace WalletPayment.API
             }
 
             app.UseAuthentication();
+            app.UseCurrentUser();
             app.UseAuthorization();
 
             app.MapCarter();
