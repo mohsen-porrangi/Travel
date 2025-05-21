@@ -69,8 +69,7 @@ public class Transaction : EntityWithDomainEvents
         DueDate = dueDate;
         PaymentReferenceId = paymentReferenceId;
         OrderId = orderId;
-        RelatedTransactionId = relatedTransactionId;
-        IsActive = true;
+        RelatedTransactionId = relatedTransactionId;        
         IsDeleted = false;
         CreatedAt = DateTime.UtcNow;
         UpdatedAt = DateTime.UtcNow;

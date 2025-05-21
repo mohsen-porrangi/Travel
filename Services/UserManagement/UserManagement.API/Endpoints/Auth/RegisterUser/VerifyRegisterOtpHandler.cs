@@ -19,7 +19,7 @@ internal sealed class VerifyRegisterOtpCommandHandler(
         var user = await uow.Users.GetUserByIdentityIdAsync(identity.Id)
                    ?? throw new InvalidOperationException("کاربر یافت نشد");
 
-        user.IsActive = true;
+        user.MasterIdentity.IsActive = true;
 
         await uow.Users.UpdateAsync(user);
         await uow.SaveChangesAsync(cancellationToken);

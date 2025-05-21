@@ -22,7 +22,8 @@ internal sealed class RegisterUserCommandHandler(
             Id = Guid.NewGuid(),
             Mobile = command.Mobile,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(command.Password),
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            IsActive = false  // کاربر تا زمان تأیید OTP غیرفعال است
         };
 
 
@@ -33,8 +34,7 @@ internal sealed class RegisterUserCommandHandler(
             Family = string.Empty,
             NationalCode = string.Empty,
             Gender = null,
-            BirthDate = default,
-            IsActive = false  // کاربر تا زمان تأیید OTP غیرفعال است
+            BirthDate = default,           
         };
 
         await uow.Users.AddIdentityAsync(identity);

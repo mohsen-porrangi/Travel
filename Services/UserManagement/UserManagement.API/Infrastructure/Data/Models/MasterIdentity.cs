@@ -14,6 +14,7 @@ namespace UserManagement.API.Infrastructure.Data.Models
 
         public Guid? ResetToken { get; set; }
         public DateTime? ResetTokenExpiry { get; set; }
+        public bool IsActive { get; set; } = true;
 
     }
 

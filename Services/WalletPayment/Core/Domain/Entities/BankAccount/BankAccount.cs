@@ -12,6 +12,7 @@ public class BankAccount : EntityWithDomainEvents
     public string ShabaNumber { get; private set; }
     public string AccountHolderName { get; private set; }
     public bool IsVerified { get; private set; }
+    public bool IsActive { get; private set; }
     public bool IsDefault { get; private set; }
 
     

@@ -16,7 +16,7 @@
                 user.Family,
                 identity.Email,
                 identity.Mobile,
-                user.IsActive
+                identity.IsActive
             );
         }
     }

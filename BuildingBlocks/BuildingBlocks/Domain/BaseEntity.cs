@@ -5,9 +5,7 @@
         public T Id { get; set; } = default!;
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
-
-        public bool IsActive { get; set; } = true;
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;        
         public bool IsDeleted { get; set; } = false;
     }
 }

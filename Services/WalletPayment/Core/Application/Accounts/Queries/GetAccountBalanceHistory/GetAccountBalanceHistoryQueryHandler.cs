@@ -37,25 +37,41 @@ public class GetAccountBalanceHistoryQueryHandler(
 
         foreach (var snapshot in snapshotsList)
         {
-            decimal change = 0;
-            decimal changePercentage = 0;
-
-            if (previousBalance.HasValue)
+            if (request.Detailed)
             {
-                change = snapshot.Balance - previousBalance.Value;
-                changePercentage = previousBalance.Value != 0
-                    ? (change / previousBalance.Value) * 100
-                    : 0;
+                // محاسبات کامل برای حالت detailed
+                decimal change = 0;
+                decimal changePercentage = 0;
+
+                if (previousBalance.HasValue)
+                {
+                    change = snapshot.Balance - previousBalance.Value;
+                    changePercentage = previousBalance.Value != 0
+                        ? (change / previousBalance.Value) * 100
+                        : 0;
+                }
+
+                historyItems.Add(new BalanceHistoryItem
+                {
+                    Date = snapshot.SnapshotDate,
+                    Balance = snapshot.Balance,
+                    Type = snapshot.Type.ToString(),
+                    Change = change,
+                    ChangePercentage = Math.Round(changePercentage, 2)
+                });
             }
-
-            historyItems.Add(new BalanceHistoryItem
+            else
             {
-                Date = snapshot.SnapshotDate,
-                Balance = snapshot.Balance,
-                Type = snapshot.Type.ToString(),
-                Change = change,
-                ChangePercentage = Math.Round(changePercentage, 2)
-            });
+                // نسخه ساده برای حالت غیر detailed (مشابه endpoint /snapshots قبلی)
+                historyItems.Add(new BalanceHistoryItem
+                {
+                    Date = snapshot.SnapshotDate,
+                    Balance = snapshot.Balance,
+                    Type = snapshot.Type.ToString(),
+                    Change = 0,
+                    ChangePercentage = 0
+                });
+            }
 
             previousBalance = snapshot.Balance;
         }
@@ -63,7 +79,7 @@ public class GetAccountBalanceHistoryQueryHandler(
         return new AccountBalanceHistoryResponse
         {
             AccountId = account.Id,
-            AccountNumber = account.AccountNumber,
+            CurrencyAccountCode = account.CurrencyAccountCode, // نام فیلد نیز بروزرسانی شده است
             Currency = account.Currency.ToString(),
             CurrentBalance = account.Balance,
             StartDate = request.StartDate,

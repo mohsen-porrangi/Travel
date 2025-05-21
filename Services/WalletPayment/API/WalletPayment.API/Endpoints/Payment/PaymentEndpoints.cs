@@ -123,54 +123,7 @@ public class PaymentEndpoints : ICarterModule
         })
         .WithTags("Payments")
         .RequireAuthorization();
-
-
-
-        app.MapPost("/integrated-purchase", async (
-            [FromBody] IntegratedPurchaseCommand command,
-            ISender sender,
-            CancellationToken cancellationToken) =>
-        {
-            var result = await sender.Send(command, cancellationToken);
-            return Results.Ok(result);
-        })
-        .WithTags("IntegratedPurchase")
-        .RequireAuthorization();
-
-        app.MapPost("/payments/integrated-purchase", async (
-            [FromBody] IntegratedPaymentRequest request,
-            ISender sender,
-            CancellationToken cancellationToken) =>
-                {
-                    // ایجاد کامند مناسب
-                    var command = new CreateIntegratedPurchaseCommand
-                    {
-                        UserId = request.UserId,
-                        Amount = request.Amount,
-                        Currency = request.Currency,
-                        Description = request.Description,
-                        GatewayType = request.GatewayType,
-                        CallbackUrl = request.CallbackUrl,
-                        OrderId = request.OrderId,
-                        Metadata = request.Metadata
-                    };
-        
-                    // ارسال کامند به هندلر مربوطه
-                    var result = await sender.Send(command, cancellationToken);
-        
-                    // بررسی نتیجه
-                    if (result.IsSuccessful)
-                    {
-                        return Results.Ok(result);
-                    }
-                    else
-                    {
-                        return Results.BadRequest(result);
-                    }
-                })
-        .WithTags("Payments")
-        .WithName("IntegratedPurchase")
-        .RequireAuthorization();
+       
     }
 
 }
@@ -194,16 +147,4 @@ public class RefundPaymentRequest
     public Guid UserId { get; set; }
     public string Reason { get; set; } = string.Empty;
     public decimal? Amount { get; set; }
-}
-
-public class IntegratedPaymentRequest
-{
-    public Guid UserId { get; set; }
-    public decimal Amount { get; set; }
-    public CurrencyCode Currency { get; set; } = CurrencyCode.IRR;
-    public string Description { get; set; } = string.Empty;
-    public PaymentGatewayType GatewayType { get; set; } = PaymentGatewayType.ZarinPal;
-    public string CallbackUrl { get; set; } = string.Empty;
-    public string OrderId { get; set; } = string.Empty;
-    public Dictionary<string, string>? Metadata { get; set; }
 }

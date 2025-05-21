@@ -35,8 +35,7 @@ public class PaymentTransaction : EntityWithDomainEvents, ISoftDelete
         GatewayToken = gatewayToken;
         Status = PaymentTransactionStatus.Pending;
         Description = description;
-        OrderId = orderId;
-        IsActive = true;
+        OrderId = orderId;        
         IsDeleted = false;
         CreatedAt = DateTime.UtcNow;
         UpdatedAt = DateTime.UtcNow;

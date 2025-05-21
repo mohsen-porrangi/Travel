@@ -13,37 +13,27 @@ public class AccountSnapshotEndpoints : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-  
-
-        app.MapGet("/accounts/{accountId:guid}/snapshots", async (
-            Guid accountId,
-            [FromQuery] DateTime? startDate,
-            [FromQuery] DateTime? endDate,
-            [FromQuery] SnapshotType? type,
-            IAccountSnapshotService snapshotService,
-            CancellationToken cancellationToken) =>
-        {
-            var snapshots = await snapshotService.GetAccountSnapshotsAsync(
-                accountId, startDate, endDate, type, cancellationToken);
-            return Results.Ok(snapshots);
-        })
-        .WithTags("AccountSnapshots")
-        .RequireAuthorization();
-
-
+        // تنها endpoint برای تاریخچه موجودی حساب
         app.MapGet("/accounts/{accountId:guid}/balance-history", async (
             Guid accountId,
-            [FromQuery] DateTime startDate,
-            [FromQuery] DateTime endDate,
-            [FromQuery] SnapshotType? type,
             ISender sender,
-            CancellationToken cancellationToken) =>
+            CancellationToken cancellationToken,
+            [FromQuery] DateTime? startDate,  // اختیاری شده
+            [FromQuery] DateTime? endDate,    // اختیاری شده
+            [FromQuery] SnapshotType? type,
+            [FromQuery] bool detailed = true // پارامتر جدید برای کنترل سطح جزئیات
+            ) =>
         {
-            var query = new GetAccountBalanceHistoryQuery(accountId, startDate, endDate, type);
+            // اگر تاریخ‌ها تعیین نشده باشند، مقادیر پیش‌فرض تنظیم می‌شوند
+            startDate ??= DateTime.UtcNow.AddMonths(-1);
+            endDate ??= DateTime.UtcNow;
+
+            var query = new GetAccountBalanceHistoryQuery(accountId, startDate.Value, endDate.Value, type, detailed);
             var result = await sender.Send(query, cancellationToken);
             return Results.Ok(result);
         })
-            .WithTags("AccountSnapshots")
-            .RequireAuthorization();
+        .WithTags("AccountHistory")
+        .WithName("GetAccountBalanceHistory")
+        .RequireAuthorization();
     }
 }

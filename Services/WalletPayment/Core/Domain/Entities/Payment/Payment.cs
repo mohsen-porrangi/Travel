@@ -51,8 +51,7 @@ public class Payment : EntityWithDomainEvents, ISoftDelete
         Description = description;
         Status = PaymentStatus.Pending;
         CallbackUrl = callbackUrl;
-        CreatedAt = DateTime.UtcNow;
-        IsActive = true;
+        CreatedAt = DateTime.UtcNow;        
         IsDeleted = false;
     }
 

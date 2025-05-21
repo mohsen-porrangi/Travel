@@ -12,7 +12,7 @@
                 user.Name,
                 user.Family,
                 user.MasterIdentity.Email,
-                user.IsActive
+                user.MasterIdentity.IsActive
             ));
 
             return new GetAllUsersResult(result);

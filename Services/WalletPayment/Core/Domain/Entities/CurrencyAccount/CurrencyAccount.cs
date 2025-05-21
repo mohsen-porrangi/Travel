@@ -10,6 +10,8 @@ public class CurrencyAccount : EntityWithDomainEvents
     public string CurrencyAccountCode { get; private set; }
     public CurrencyCode Currency { get; private set; }
     public decimal Balance { get; private set; }
+    public bool IsActive { get; private set; }
+
 
     private readonly List<Transaction.Transaction> _transactions = new();
     public IReadOnlyCollection<Transaction.Transaction> Transactions => _transactions.AsReadOnly();

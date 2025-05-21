@@ -26,37 +26,44 @@ public class CurrencyEndpoints : ICarterModule
         ))
         .AllowAnonymous();
 
-        app.MapPost("/wallets/convert-currency", async (
-             ISender sender,
+        app.MapPost("/wallets/convert-currency/preview", async (
+            ISender sender,
             CancellationToken cancellationToken,
-            [FromBody] ConvertCurrencyCommand command,
-            [FromQuery] bool preview = false
-           ) =>
+            [FromBody] ConversionPreviewRequest request
+        ) =>
         {
-            if (preview)
+            var query = new GetConversionPreviewQuery
             {
-                // اگر فقط پیش‌نمایش نیاز است
-                var previewQuery = new GetConversionPreviewQuery
-                {
-                    SourceAmount = command.SourceAmount,
-                    SourceCurrency = command.SourceCurrency,
-                    TargetCurrency = command.TargetCurrency
-                };
-                var previewResult = await sender.Send(previewQuery, cancellationToken);
-                return Results.Ok(previewResult);
-            }
-            else
-            {
-                // انجام عملیات واقعی تبدیل
-                var result = await sender.Send(command, cancellationToken);
-                return Results.Ok(result);
-            }
+                SourceAmount = request.SourceAmount,
+                SourceCurrency = request.SourceCurrency,
+                TargetCurrency = request.TargetCurrency
+            };
+
+            var previewResult = await sender.Send(query, cancellationToken);
+            return Results.Ok(previewResult);
         })
-                .WithTags("Currency")
+        .WithTags("Currency")
+        .WithName("PreviewCurrencyConversion")
+        .WithMetadata(new SwaggerOperationAttribute(
+            summary: "پیش‌نمایش تبدیل ارز",
+            description: "نتایج تبدیل ارز را قبل از انجام عملیات واقعی نمایش می‌دهد"
+        ))
+        .RequireAuthorization();
+        // endpoint اصلی برای تبدیل ارز
+        app.MapPost("/wallets/convert-currency", async (
+            ISender sender,
+            CancellationToken cancellationToken,
+            [FromBody] ConvertCurrencyCommand command
+        ) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return Results.Ok(result);
+        })
+        .WithTags("Currency")
         .WithName("ConvertCurrency")
         .WithMetadata(new SwaggerOperationAttribute(
             summary: "تبدیل ارز در کیف پول",
-            description: "این endpoint برای تبدیل ارز بین حساب‌های مختلف کیف پول استفاده می‌شود. با استفاده از پارامتر preview می‌توان نتایج تبدیل را قبل از انجام آن مشاهده کرد."
+            description: "عملیات تبدیل ارز بین حساب‌های مختلف کیف پول"
         ))
         .RequireAuthorization();
     }

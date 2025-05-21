@@ -18,12 +18,12 @@ namespace UserManagement.API.Infrastructure.Data.Models
 
         public void Deactivate()
         {
-            IsActive = false;
+            MasterIdentity.IsActive = false;
             UpdatedAt = DateTime.UtcNow;
         }
         public void Activate()
         {
-            IsActive = true;
+            MasterIdentity.IsActive = true;
             UpdatedAt = DateTime.UtcNow;
         }
         public void UpdateProfile(string name, string family, string? nationalCode, Gender? gender, DateTime birthDate)

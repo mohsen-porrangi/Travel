@@ -32,8 +32,7 @@ public class CreditHistory : EntityWithDomainEvents
         DueDate = dueDate;
         SettlementTransactionId = settlementTransactionId;
         Status = status;
-        Description = description;
-        IsActive = true;
+        Description = description;        
         IsDeleted = false;
         CreatedAt = DateTime.UtcNow;
         UpdatedAt = DateTime.UtcNow;

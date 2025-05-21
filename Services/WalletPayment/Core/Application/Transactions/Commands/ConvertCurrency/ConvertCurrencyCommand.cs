@@ -24,3 +24,9 @@ public record ConvertCurrencyResponse
     public decimal FeeAmount { get; init; }
     public DateTime ConversionDate { get; init; }
 }
+public class ConversionPreviewRequest
+{
+    public decimal SourceAmount { get; set; }
+    public CurrencyCode SourceCurrency { get; set; }
+    public CurrencyCode TargetCurrency { get; set; }
+}

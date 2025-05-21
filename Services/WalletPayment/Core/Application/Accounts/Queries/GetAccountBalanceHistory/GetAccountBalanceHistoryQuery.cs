@@ -7,12 +7,13 @@ public record GetAccountBalanceHistoryQuery(
     Guid AccountId,
     DateTime StartDate,
     DateTime EndDate,
-    SnapshotType? SnapshotType) : IQuery<AccountBalanceHistoryResponse>;
+    SnapshotType? SnapshotType,
+    bool Detailed = true) : IQuery<AccountBalanceHistoryResponse>;
 
 public record AccountBalanceHistoryResponse
 {
     public Guid AccountId { get; init; }
-    public string AccountNumber { get; init; }
+    public string CurrencyAccountCode { get; init; } 
     public string Currency { get; init; }
     public decimal CurrentBalance { get; init; }
     public DateTime StartDate { get; init; }

@@ -13,6 +13,7 @@ public class Wallet : EntityWithDomainEvents, IAggregateRoot, ISoftDelete
     public decimal CreditLimit { get; private set; }
     public decimal CreditBalance { get; private set; }
     public DateTime? CreditDueDate { get; private set; }
+    public bool IsActive { get; private set; }
 
     private readonly List<CurrencyAccount> _accounts = new();
     private readonly List<CreditHistory> _creditHistory = new();

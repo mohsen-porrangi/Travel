@@ -14,7 +14,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Data\Migrations\" />
     <Folder Include="Data\Seeding\" />
     <Folder Include="ExternalServices\PaymentGateway\" />
     <Folder Include="ExternalServices\UserManagement\" />

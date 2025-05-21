@@ -42,7 +42,7 @@ namespace UserManagement.API.Services
             if (user == null)
                 throw new NotFoundException("کاربر یافت نشد", $"کاربری با شناسه {userId} یافت نشد");
 
-            return user.IsActive;
+            return user.MasterIdentity.IsActive;
         }
         public async Task<bool> ValidateCredentialsAsync(string mobile, string password)
         {
@@ -94,7 +94,7 @@ namespace UserManagement.API.Services
                 throw new NotFoundException("کاربر یافت نشد", $"کاربری با شناسه هویت {identity.Id} یافت نشد");
             }
 
-            if (!user.IsActive)
+            if (!user.MasterIdentity.IsActive)
             {
                 logger.LogWarning("Authentication failed: User account is inactive for {UserId}", user.Id);
                 throw new ForbiddenDomainException("حساب کاربری غیرفعال است");

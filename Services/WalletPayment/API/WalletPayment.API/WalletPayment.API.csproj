@@ -24,4 +24,9 @@
     <ProjectReference Include="..\..\Infrastructure\WalletPayment.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Endpoints\Admin\" />
+    <Folder Include="Endpoints\IntegratedPurchase\" />
+  </ItemGroup>
+
 </Project>

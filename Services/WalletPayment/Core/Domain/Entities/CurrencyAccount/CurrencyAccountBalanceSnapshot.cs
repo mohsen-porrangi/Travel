@@ -23,8 +23,7 @@ public class CurrencyAccountBalanceSnapshot : EntityWithDomainEvents, ISoftDelet
         AccountInfoId = accountInfoId;
         Balance = balance;
         SnapshotDate = DateTime.UtcNow;
-        Type = type;
-        IsActive = true;
+        Type = type;        
         IsDeleted = false;
         CreatedAt = DateTime.UtcNow;
         UpdatedAt = DateTime.UtcNow;

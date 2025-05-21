@@ -7,7 +7,7 @@ namespace UserManagement.API.Infrastructure.Data.Models
         public string Module { get; set; } = default!;   // e.g., "Flight", "Wallet"
         public string Action { get; set; } = default!;   // e.g., "View", "Edit"
         public string Description { get; set; } = default!;
-        public string Code => $"{Module}.{Action}"; // ✅ اضافه شد
+        public string Code => $"{Module}.{Action}"; 
 
         public virtual ICollection<RolePermission> RolePermissions { get; set; } = new List<RolePermission>();
     }

@@ -48,7 +48,7 @@ internal sealed class LoginUserCommandHandler(
             var user = await uow.Users.GetUserByIdentityIdAsync(identity.Id)
                 ?? throw new NotFoundException("کاربر یافت نشد", $"کاربری با شناسه هویت {identity.Id} یافت نشد");
 
-            if (!user.IsActive)
+            if (!user.MasterIdentity.IsActive)
                 throw new ForbiddenDomainException("حساب کاربری غیرفعال است");
 
             var permissions = await uow.Users.GetUserPermissionsAsync(user.Id);
@@ -74,7 +74,7 @@ internal sealed class LoginUserCommandHandler(
             var user = await uow.Users.GetUserByIdentityIdAsync(identity.Id)
                 ?? throw new NotFoundException("کاربر یافت نشد", $"کاربری با شناسه هویت {identity.Id} یافت نشد");
 
-            if (!user.IsActive)
+            if (!user.MasterIdentity.IsActive)
                 throw new ForbiddenDomainException("حساب کاربری غیرفعال است");
 
             var permissions = await uow.Users.GetUserPermissionsAsync(user.Id);

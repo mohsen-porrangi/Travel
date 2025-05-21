@@ -20,7 +20,7 @@ namespace UserManagement.API.Endpoints.Users.GetUserByCondition
                 predicate = predicate.And(user => user.MasterIdentity.Mobile.Contains(query.Mobile));
 
             if (query.IsActive.HasValue)
-                predicate = predicate.And(user => user.IsActive == query.IsActive.Value);
+                predicate = predicate.And(user => user.MasterIdentity.IsActive == query.IsActive.Value);
 
             if (!string.IsNullOrWhiteSpace(query.NationalCode))
                 predicate = predicate.And(user => user.NationalCode == query.NationalCode);
@@ -41,7 +41,7 @@ namespace UserManagement.API.Endpoints.Users.GetUserByCondition
                 user.Family,
                 user.MasterIdentity.Email,
                 user.MasterIdentity.Mobile,
-                user.IsActive,
+                user.MasterIdentity.IsActive,
                 user.NationalCode
             ));
 
