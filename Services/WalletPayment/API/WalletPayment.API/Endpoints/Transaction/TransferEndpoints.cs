@@ -18,7 +18,13 @@ public class TransferEndpoints : ICarterModule
             var result = await sender.Send(command, cancellationToken);
             return Results.Ok(result);
         })
-        .WithTags("Transfers")
+        .WithName("TransferMoney")
+.WithDescription("انتقال وجه بین کاربران با محاسبه کارمزد")
+.Produces<TransferMoneyResponse>(StatusCodes.Status200OK)
+.Produces(StatusCodes.Status401Unauthorized)
+.ProducesProblem(StatusCodes.Status400BadRequest)
+.ProducesProblem(StatusCodes.Status409Conflict)
+.WithTags("Transfers")
         .RequireAuthorization();
     }
 }

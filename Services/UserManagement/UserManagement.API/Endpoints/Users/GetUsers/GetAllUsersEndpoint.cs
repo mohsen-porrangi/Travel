@@ -4,7 +4,7 @@ namespace UserManagement.API.Endpoints.Users.GetUsers
 {
     public class GetAllUsersEndpoint : ICarterModule
     {
-        [RequirePermission(UserPermissions.Read)]
+       // [RequirePermission(UserPermissions.Read)]
         public void AddRoutes(IEndpointRouteBuilder app)
         {
             app.MapGet("/users", async (ISender sender, CancellationToken ct) =>

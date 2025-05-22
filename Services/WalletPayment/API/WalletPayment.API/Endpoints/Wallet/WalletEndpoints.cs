@@ -16,6 +16,12 @@ public class WalletEndpoints : ICarterModule
             var result = await sender.Send(command, cancellationToken);
             return Results.Ok(result);
         })
+        .WithName("CreateWallet")
+        .WithDescription("ایجاد کیف پول جدید برای کاربر")
+        .Produces<CreateWalletResponse>(StatusCodes.Status200OK)
+        .Produces(StatusCodes.Status401Unauthorized)
+        .ProducesProblem(StatusCodes.Status400BadRequest)
+        .ProducesProblem(StatusCodes.Status409Conflict)
         .WithTags("Wallets")
         .RequireAuthorization();
     }

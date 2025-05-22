@@ -3,7 +3,7 @@ using WalletPayment.Domain.Entities.Enums;
 
 namespace WalletPayment.Application.Payment.Commands.CreateIntegratedPurchase;
 
-public record CreateIntegratedPurchaseCommand : ICommand<IntegratedPurchaseResponse>
+public record CreateIntegratedPurchaseCommand : ICommand<CreateIntegratedPurchaseResponse>
 {
     public Guid UserId { get; init; }
     public decimal Amount { get; init; }
@@ -15,7 +15,7 @@ public record CreateIntegratedPurchaseCommand : ICommand<IntegratedPurchaseRespo
     public Dictionary<string, string>? Metadata { get; init; }
 }
 
-public record IntegratedPurchaseResponse
+public record CreateIntegratedPurchaseResponse
 {
     public bool IsSuccessful { get; init; }
     public string? PaymentUrl { get; init; }

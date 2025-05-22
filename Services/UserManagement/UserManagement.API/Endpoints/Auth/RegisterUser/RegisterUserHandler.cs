@@ -1,12 +1,15 @@
 ﻿using BuildingBlocks.Contracts;
 using BuildingBlocks.Enums;
 using BuildingBlocks.Exceptions;
+using Microsoft.Extensions.Logging;
 
 namespace UserManagement.API.Endpoints.Auth.RegisterUser;
 
 internal sealed class RegisterUserCommandHandler(
     IUnitOfWork uow,
-    IOtpService otpService
+    IOtpService otpService,
+    ITemporaryRegistrationService tempRegistrationService,
+    ILogger<RegisterUserCommandHandler> logger
 ) : ICommandHandler<RegisterUserCommand>
 {
     public async Task<Unit> Handle(RegisterUserCommand command, CancellationToken cancellationToken)
@@ -16,40 +19,40 @@ internal sealed class RegisterUserCommandHandler(
             throw new BadRequestException("شماره موبایل تکراری است",
                 $"کاربری با شماره موبایل {command.Mobile} قبلاً ثبت شده است");
 
-
-        var identity = new MasterIdentity
+        // بررسی وجود درخواست ثبت‌نام موقت فعال
+        var hasPendingRegistration = await tempRegistrationService.HasPendingRegistrationAsync(command.Mobile);
+        if (hasPendingRegistration)
         {
-            Id = Guid.NewGuid(),
-            Mobile = command.Mobile,
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword(command.Password),
-            CreatedAt = DateTime.UtcNow,
-            IsActive = false  // کاربر تا زمان تأیید OTP غیرفعال است
-        };
+            logger.LogInformation("Found pending registration for mobile: {Mobile}, sending new OTP", command.Mobile);
 
-
-        var user = new User
-        {
-            IdentityId = identity.Id,
-            Name = string.Empty,
-            Family = string.Empty,
-            NationalCode = string.Empty,
-            Gender = null,
-            BirthDate = default,           
-        };
-
-        await uow.Users.AddIdentityAsync(identity);
-        await uow.Users.AddAsync(user);
-
+            // اگر درخواست موقت وجود داشت، فقط OTP جدید ارسال می‌کنیم
+            await otpService.SendOtpAsync(command.Mobile);
+            logger.LogInformation("New OTP sent for pending registration: {Mobile}", command.Mobile);
+            return Unit.Value;
+        }
         try
         {
+            // هش کردن رمز عبور
+            var passwordHash = BCrypt.Net.BCrypt.HashPassword(command.Password);
+
+            // ذخیره موقت اطلاعات ثبت‌نام
+            await tempRegistrationService.StoreTemporaryRegistrationAsync(command.Mobile, passwordHash);
+
+            // ارسال OTP
             await otpService.SendOtpAsync(command.Mobile);
-            await uow.SaveChangesAsync(cancellationToken);
+
+            logger.LogInformation("Temporary registration stored and OTP sent for mobile: {Mobile}", command.Mobile);
         }
         catch (Exception ex)
         {
-            throw new InternalServerException("خطا در ثبت کاربر", ex.Message);
-        }
+            logger.LogError(ex, "Error during registration process for mobile: {Mobile}", command.Mobile);
 
+            // در صورت خطا، اطلاعات موقت را پاک می‌کنیم
+            await tempRegistrationService.RemoveTemporaryRegistrationAsync(command.Mobile);
+
+            throw new InternalServerException("خطا در فرآیند ثبت‌نام",
+                "لطفاً مجدداً تلاش کنید یا با پشتیبانی تماس بگیرید");
+        }
         return Unit.Value;
     }
 }

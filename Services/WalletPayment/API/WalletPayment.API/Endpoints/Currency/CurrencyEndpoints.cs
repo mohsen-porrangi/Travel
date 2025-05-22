@@ -18,12 +18,11 @@ public class CurrencyEndpoints : ICarterModule
             var result = await sender.Send(new GetExchangeRatesQuery(), cancellationToken);
             return Results.Ok(result);
         })
-       .WithTags("Currency")
-       .WithName("GetExchangeRates")
-       .WithMetadata(new SwaggerOperationAttribute(
-            summary: "دریافت نرخ‌های تبدیل ارز",
-            description: "این endpoint لیست تمام نرخ‌های تبدیل بین ارزهای مختلف را برمی‌گرداند"
-        ))
+     .WithName("GetExchangeRates")
+.WithDescription("دریافت آخرین نرخ‌های تبدیل بین تمام ارزهای پشتیبانی شده")
+.Produces<ExchangeRatesResponse>(StatusCodes.Status200OK)
+.ProducesProblem(StatusCodes.Status500InternalServerError)
+.WithTags("Currency")
         .AllowAnonymous();
 
         app.MapPost("/wallets/convert-currency/preview", async (
@@ -42,12 +41,12 @@ public class CurrencyEndpoints : ICarterModule
             var previewResult = await sender.Send(query, cancellationToken);
             return Results.Ok(previewResult);
         })
-        .WithTags("Currency")
-        .WithName("PreviewCurrencyConversion")
-        .WithMetadata(new SwaggerOperationAttribute(
-            summary: "پیش‌نمایش تبدیل ارز",
-            description: "نتایج تبدیل ارز را قبل از انجام عملیات واقعی نمایش می‌دهد"
-        ))
+     .WithName("PreviewCurrencyConversion")
+.WithDescription("محاسبه و نمایش نتیجه تبدیل ارز قبل از انجام عملیات")
+.Produces<ConversionPreviewResponse>(StatusCodes.Status200OK)
+.Produces(StatusCodes.Status401Unauthorized)
+.ProducesProblem(StatusCodes.Status400BadRequest)
+.WithTags("Currency")
         .RequireAuthorization();
         // endpoint اصلی برای تبدیل ارز
         app.MapPost("/wallets/convert-currency", async (
@@ -59,12 +58,13 @@ public class CurrencyEndpoints : ICarterModule
             var result = await sender.Send(command, cancellationToken);
             return Results.Ok(result);
         })
-        .WithTags("Currency")
-        .WithName("ConvertCurrency")
-        .WithMetadata(new SwaggerOperationAttribute(
-            summary: "تبدیل ارز در کیف پول",
-            description: "عملیات تبدیل ارز بین حساب‌های مختلف کیف پول"
-        ))
+    .WithName("ConvertCurrency")
+.WithDescription("تبدیل ارز بین حساب‌های مختلف در کیف پول")
+.Produces<ConvertCurrencyResponse>(StatusCodes.Status200OK)
+.Produces(StatusCodes.Status401Unauthorized)
+.ProducesProblem(StatusCodes.Status400BadRequest)
+.ProducesProblem(StatusCodes.Status409Conflict)
+.WithTags("Currency")
         .RequireAuthorization();
     }
 }

@@ -18,7 +18,7 @@ public class IntegratedPurchaseEndpoints : ICarterModule
             ISender sender,
             CancellationToken cancellationToken) =>
         {
-            var command = new CreateIntegratedPurchaseCommand
+            var command = new Application.Payment.Commands.CreateIntegratedPurchase.CreateIntegratedPurchaseCommand
             {
                 UserId = request.UserId,
                 Amount = request.Amount,
@@ -53,8 +53,12 @@ public class IntegratedPurchaseEndpoints : ICarterModule
                 });
             }
         })
-        .WithTags("Payments")
         .WithName("CreateIntegratedPurchase")
+        .WithDescription("شروع فرآیند خرید یکپارچه با شارژ خودکار کیف پول و هدایت به درگاه")
+        .Produces<ExecuteIntegratedPurchaseResponse>(StatusCodes.Status200OK)
+        .Produces(StatusCodes.Status401Unauthorized)
+        .ProducesProblem(StatusCodes.Status400BadRequest)
+        .WithTags("Payments")
         .RequireAuthorization();
 
         // Endpoint برای اجرای مستقیم خرید یکپارچه (بدون درگاه پرداخت)
@@ -75,8 +79,12 @@ public class IntegratedPurchaseEndpoints : ICarterModule
             var result = await sender.Send(command, cancellationToken);
             return Results.Ok(result);
         })
-        .WithTags("Payments")
         .WithName("ExecuteIntegratedPurchase")
+.WithDescription("اجرای مستقیم خرید یکپارچه بدون هدایت به درگاه (پس از پرداخت موفق)")
+.Produces<ExecuteIntegratedPurchaseResponse>(StatusCodes.Status200OK)
+.Produces(StatusCodes.Status401Unauthorized)
+.ProducesProblem(StatusCodes.Status400BadRequest)
+.WithTags("Payments")
         .RequireAuthorization();
     }
 }

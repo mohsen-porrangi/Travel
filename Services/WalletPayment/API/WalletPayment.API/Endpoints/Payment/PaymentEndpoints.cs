@@ -1,4 +1,5 @@
-﻿using Carter;
+﻿using BuildingBlocks.Contracts;
+using Carter;
 using Microsoft.AspNetCore.Mvc;
 using WalletPayment.API.Models.Payment;
 using WalletPayment.Application.Common.Contracts;
@@ -48,8 +49,12 @@ public class PaymentEndpoints : ICarterModule
                 });
             }
         })
-        .WithTags("Payments")
         .WithName("CreatePayment")
+.WithDescription("ایجاد درخواست پرداخت جدید و دریافت لینک هدایت به درگاه")
+.Produces<PaymentRequestResult>(StatusCodes.Status200OK)
+.Produces(StatusCodes.Status401Unauthorized)
+.ProducesProblem(StatusCodes.Status400BadRequest)
+.WithTags("Payments")
         .RequireAuthorization();
 
         // 2. دریافت جزئیات پرداخت
@@ -76,8 +81,13 @@ public class PaymentEndpoints : ICarterModule
                 return Results.Forbid();
             }
         })
-        .WithTags("Payments")
         .WithName("GetPaymentDetails")
+.WithDescription("دریافت اطلاعات کامل یک پرداخت خاص")
+.Produces<PaymentDetailsDto>(StatusCodes.Status200OK)
+.Produces(StatusCodes.Status401Unauthorized)
+.ProducesProblem(StatusCodes.Status404NotFound)
+.ProducesProblem(StatusCodes.Status403Forbidden)
+.WithTags("Payments")
         .RequireAuthorization();
 
         // 3. دریافت تاریخچه پرداخت‌های کاربر جاری
@@ -94,8 +104,11 @@ public class PaymentEndpoints : ICarterModule
                 userId, pageNumber, pageSize, cancellationToken);
             return Results.Ok(paymentHistory);
         })
-        .WithTags("Payments")
         .WithName("GetPaymentHistory")
+.WithDescription("دریافت تاریخچه تمام پرداخت‌های انجام شده توسط کاربر با صفحه‌بندی")
+.Produces<PaymentHistoryResult>(StatusCodes.Status200OK)
+.Produces(StatusCodes.Status401Unauthorized)
+.WithTags("Payments")
         .RequireAuthorization();
     }
 }

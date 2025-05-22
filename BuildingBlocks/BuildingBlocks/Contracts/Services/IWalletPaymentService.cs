@@ -9,6 +9,11 @@ namespace BuildingBlocks.Contracts.Services
     public interface IWalletPaymentService
     {
         /// <summary>
+        /// ایجاد کیف پول جدید برای کاربر
+        /// </summary>
+        Task<bool> CreateWalletAsync(Guid userId, string defaultCurrency = "IRR");
+
+        /// <summary>
         /// بررسی موجودی کیف پول کاربر
         /// </summary>
         Task<decimal> GetBalanceAsync(Guid userId);

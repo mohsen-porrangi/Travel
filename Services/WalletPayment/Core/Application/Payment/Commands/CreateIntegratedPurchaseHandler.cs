@@ -6,7 +6,7 @@ using WalletPayment.Application.Payment.Contracts;
 namespace WalletPayment.Application.Payment.Commands.CreateIntegratedPurchase;
 
 public class CreateIntegratedPurchaseCommandHandler :
-    ICommandHandler<CreateIntegratedPurchaseCommand, IntegratedPurchaseResponse>
+    ICommandHandler<CreateIntegratedPurchaseCommand, CreateIntegratedPurchaseResponse>
 {
     private readonly IWalletRepository _walletRepository;
     private readonly IIntegratedPurchaseService _integratedPurchaseService;
@@ -22,7 +22,7 @@ public class CreateIntegratedPurchaseCommandHandler :
         _logger = logger;
     }
 
-    public async Task<IntegratedPurchaseResponse> Handle(
+    public async Task<CreateIntegratedPurchaseResponse> Handle(
         CreateIntegratedPurchaseCommand request,
         CancellationToken cancellationToken)
     {
@@ -32,7 +32,7 @@ public class CreateIntegratedPurchaseCommandHandler :
             var wallet = await _walletRepository.GetByUserIdAsync(request.UserId, cancellationToken);
             if (wallet == null)
             {
-                return new IntegratedPurchaseResponse
+                return new CreateIntegratedPurchaseResponse
                 {
                     IsSuccessful = false,
                     ErrorMessage = "کیف پول کاربر یافت نشد"
@@ -55,7 +55,7 @@ public class CreateIntegratedPurchaseCommandHandler :
                     // در اینجا می‌توان مستقیماً از خود کیف پول برداشت کرد
                     // و نیازی به درگاه پرداخت نیست
 
-                    return new IntegratedPurchaseResponse
+                    return new CreateIntegratedPurchaseResponse
                     {
                         IsSuccessful = true,
                         UseWalletBalance = true,
@@ -93,7 +93,7 @@ public class CreateIntegratedPurchaseCommandHandler :
                 request.OrderId,
                 cancellationToken);
 
-            return new IntegratedPurchaseResponse
+            return new CreateIntegratedPurchaseResponse
             {
                 IsSuccessful = result.IsSuccessful,
                 PaymentUrl = result.PaymentUrl,
@@ -109,7 +109,7 @@ public class CreateIntegratedPurchaseCommandHandler :
         catch (Exception ex)
         {
             _logger.LogError(ex, "خطا در پردازش خرید یکپارچه");
-            return new IntegratedPurchaseResponse
+            return new CreateIntegratedPurchaseResponse
             {
                 IsSuccessful = false,
                 ErrorMessage = $"خطای سیستمی: {ex.Message}"

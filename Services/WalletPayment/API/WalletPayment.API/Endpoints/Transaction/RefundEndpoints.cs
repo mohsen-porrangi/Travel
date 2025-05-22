@@ -1,4 +1,5 @@
-﻿using Carter;
+﻿using BuildingBlocks.Contracts;
+using Carter;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using WalletPayment.Application.Common.Contracts;
@@ -32,12 +33,13 @@ public class RefundEndpoints : ICarterModule
 
             return Results.Ok(result);
         })
-        .WithTags("Refunds")
         .WithName("CheckRefundability")
-        .WithMetadata(new SwaggerOperationAttribute(
-            summary: "بررسی امکان استرداد",
-            description: "بررسی می‌کند که آیا تراکنش یا پرداخت مورد نظر قابل استرداد است و جزئیات آن را برمی‌گرداند"
-        ))
+.WithDescription("بررسی قابلیت استرداد تراکنش یا پرداخت و مشاهده جزئیات استرداد")
+.Produces<RefundabilityResult>(StatusCodes.Status200OK)
+.Produces(StatusCodes.Status401Unauthorized)
+.ProducesProblem(StatusCodes.Status400BadRequest)
+.ProducesProblem(StatusCodes.Status404NotFound)
+.WithTags("Refunds")
         .RequireAuthorization();
 
         // 2. اندپوینت انجام استرداد
@@ -65,12 +67,13 @@ public class RefundEndpoints : ICarterModule
 
             return Results.Ok(result);
         })
-        .WithTags("Refunds")
         .WithName("CreateRefund")
-        .WithMetadata(new SwaggerOperationAttribute(
-            summary: "استرداد وجه",
-            description: "عملیات استرداد وجه تراکنش یا پرداخت را انجام می‌دهد"
-        ))
+.WithDescription("انجام عملیات استرداد کامل یا جزئی تراکنش/پرداخت")
+.Produces<RefundResult>(StatusCodes.Status200OK)
+.Produces(StatusCodes.Status401Unauthorized)
+.ProducesProblem(StatusCodes.Status400BadRequest)
+.ProducesProblem(StatusCodes.Status404NotFound)
+.WithTags("Refunds")
         .RequireAuthorization();
     }
 }

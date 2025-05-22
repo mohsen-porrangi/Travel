@@ -38,7 +38,12 @@ public class PaymentCallbackEndpoints : ICarterModule
                 return Results.Redirect("/payment/failure?errorMessage=خطای سیستمی");
             }
         })
-        .WithTags("Payments")
+        .WithName("ProcessPaymentCallback")
+.WithDescription("پردازش بازگشت از درگاه‌های پرداخت و تأیید تراکنش")
+.Produces(StatusCodes.Status302Found) // Redirect
+.ProducesProblem(StatusCodes.Status400BadRequest)
+.ProducesProblem(StatusCodes.Status500InternalServerError)
+.WithTags("Payments")
         .AllowAnonymous();
     }
 }

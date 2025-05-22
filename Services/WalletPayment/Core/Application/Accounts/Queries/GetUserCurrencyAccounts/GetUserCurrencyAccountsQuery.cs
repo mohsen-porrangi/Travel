@@ -1,11 +1,11 @@
 ﻿using BuildingBlocks.CQRS;
 using WalletPayment.Domain.Entities.Enums;
 
-namespace WalletPayment.Application.Accounts.Queries.GetUserAccounts;
+namespace WalletPayment.Application.Accounts.Queries.GetUserCurrencyAccounts;
 
-public record GetUserAccountsQuery(Guid UserId) : IQuery<UserAccountsResponse>;
+public record GetUserCurrencyAccountsQuery(Guid UserId) : IQuery<UserCurrencyAccountsResponse>;
 
-public record UserAccountsResponse
+public record UserCurrencyAccountsResponse
 {
     public Guid WalletId { get; init; }
     public int TotalAccounts { get; init; }

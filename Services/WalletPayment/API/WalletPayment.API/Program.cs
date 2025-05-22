@@ -6,7 +6,7 @@ using WalletPayment.API.Middleware;
 using WalletPayment.Infrastructure;
 using WalletPayment.Application;
 using WalletPayment.API.Services;
-using WalletPayment.Application.Common.Contracts;
+using BuildingBlocks.Contracts;
 
 namespace WalletPayment.API
 {

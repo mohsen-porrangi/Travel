@@ -2,12 +2,12 @@
 using BuildingBlocks.Exceptions;
 using WalletPayment.Application.Common.Contracts;
 
-namespace WalletPayment.Application.Accounts.Queries.GetUserAccounts;
+namespace WalletPayment.Application.Accounts.Queries.GetUserCurrencyAccounts;
 
-public class GetUserAccountsQueryHandler(IWalletRepository walletRepository)
-    : IQueryHandler<GetUserAccountsQuery, UserAccountsResponse>
+public class GetUserCurrencyAccountsQueryHandler(IWalletRepository walletRepository)
+    : IQueryHandler<GetUserCurrencyAccountsQuery, UserCurrencyAccountsResponse>
 {
-    public async Task<UserAccountsResponse> Handle(GetUserAccountsQuery request, CancellationToken cancellationToken)
+    public async Task<UserCurrencyAccountsResponse> Handle(GetUserCurrencyAccountsQuery request, CancellationToken cancellationToken)
     {
         // دریافت کیف پول کاربر
         var wallet = await walletRepository.GetByUserIdAsync(request.UserId, cancellationToken);
@@ -27,7 +27,7 @@ public class GetUserAccountsQueryHandler(IWalletRepository walletRepository)
             })
             .ToList();
 
-        return new UserAccountsResponse
+        return new UserCurrencyAccountsResponse
         {
             WalletId = wallet.Id,
             TotalAccounts = accountDtos.Count,

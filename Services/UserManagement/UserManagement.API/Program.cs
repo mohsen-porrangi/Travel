@@ -190,6 +190,8 @@ namespace UserManagement.API
                 var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
                 DbInitializer.Seed(db);
             }
+            app.UseMiddleware<PermissionMiddleware>();
+
 
             app.Run();
         }

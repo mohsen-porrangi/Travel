@@ -11,9 +11,9 @@ public record IntegratedPurchaseCommand(
     string Description,
     string PaymentReferenceId,
     bool AutoConvertCurrency = true) // پارامتر جدید برای تبدیل خودکار ارز
-    : ICommand<IntegratedPurchaseResponse>;
+    : ICommand<ExecuteIntegratedPurchaseResponse>; // تغییر نام به ExecuteIntegratedPurchaseResponse
 
-public record IntegratedPurchaseResponse(
+public record ExecuteIntegratedPurchaseResponse( // تغییر نام از IntegratedPurchaseResponse
     Guid DepositTransactionId,
     Guid WithdrawTransactionId,
     decimal Amount,

@@ -4,7 +4,7 @@ namespace UserManagement.API.Endpoints.Users.GetUserByCondition
 {
     public class GetUserByConditionEndpoint : ICarterModule
     {
-        [RequirePermission(UserPermissions.Read)]
+     //   [RequirePermission(UserPermissions.Read)]
         public void AddRoutes(IEndpointRouteBuilder app)
         {
             app.MapGet("/users/search", async (

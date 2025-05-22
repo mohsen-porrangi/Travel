@@ -34,8 +34,4 @@
     <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks\BuildingBlocks.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Endpoints\RoleManagement\AssignRole\" />
-  </ItemGroup>
-
 </Project>

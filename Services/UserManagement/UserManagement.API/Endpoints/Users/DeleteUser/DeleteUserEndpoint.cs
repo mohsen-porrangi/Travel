@@ -4,7 +4,7 @@ namespace UserManagement.API.Endpoints.Users.DeleteUser
 {
     public class DeleteUserEndpoint : ICarterModule
     {
-        [RequirePermission(UserPermissions.Delete)]
+      //  [RequirePermission(UserPermissions.Delete)]
         public void AddRoutes(IEndpointRouteBuilder app)
         {
             app.MapDelete("/users/{id:guid}", async (

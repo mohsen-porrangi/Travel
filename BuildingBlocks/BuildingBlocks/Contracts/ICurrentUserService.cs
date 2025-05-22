@@ -1,4 +1,4 @@
-﻿namespace WalletPayment.Application.Common.Contracts;
+﻿namespace BuildingBlocks.Contracts;
 public interface ICurrentUserService
 {
     Guid GetCurrentUserId();

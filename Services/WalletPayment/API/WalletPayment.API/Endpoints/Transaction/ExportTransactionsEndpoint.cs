@@ -1,8 +1,8 @@
-﻿using BuildingBlocks.Contracts.Services;
+﻿using BuildingBlocks.Contracts;
+using BuildingBlocks.Contracts.Services;
 using Carter;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using WalletPayment.Application.Common.Contracts;
 using WalletPayment.Application.Transactions.Queries.Common;
 using WalletPayment.Application.Transactions.Queries.ExportTransactions;
 using WalletPayment.Domain.Entities.Enums;
@@ -55,7 +55,12 @@ public class ExportTransactionsEndpoint : ICarterModule
                 result.ContentType,
                 result.FileName);
         })
-    .WithTags("Transactions")
+    .WithName("ExportTransactions")
+.WithDescription("دریافت فایل خروجی تراکنش‌ها در فرمت‌های مختلف (CSV, Excel, PDF)")
+.Produces<FileResult>(StatusCodes.Status200OK)
+.Produces(StatusCodes.Status401Unauthorized)
+.ProducesProblem(StatusCodes.Status400BadRequest)
+.WithTags("Transactions")
     .RequireAuthorization();
     }
 }

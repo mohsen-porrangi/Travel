@@ -1,4 +1,5 @@
-﻿using Carter;
+﻿using BuildingBlocks.Contracts;
+using Carter;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -8,7 +9,6 @@ using System.Threading.Tasks;
 using WalletPayment.Application.Accounts.Commands.CreateBankAccount;
 using WalletPayment.Application.Accounts.Commands.DeleteBankAccount;
 using WalletPayment.Application.Accounts.Queries.GetUserBankAccounts;
-using WalletPayment.Application.Common.Contracts;
 
 namespace WalletPayment.API.Endpoints.Account;
 
@@ -26,7 +26,13 @@ public class AccountBankEndpoints : ICarterModule
             return Results.Ok(result);
         })
         .WithTags("BankAccounts")
-        .RequireAuthorization();
+        .RequireAuthorization()
+        .WithName("GetUserBankAccounts")
+        .WithDescription("دریافت لیست تمام حساب‌های بانکی متصل به کیف پول کاربر")
+        .Produces<UserBankAccountsResponse>(StatusCodes.Status200OK)
+        .Produces(StatusCodes.Status401Unauthorized)
+        .ProducesProblem(StatusCodes.Status404NotFound)
+        .WithTags("BankAccounts");
 
         // 2. افزودن حساب بانکی جدید
         app.MapPost("/wallets/bank-accounts", async (
@@ -43,7 +49,12 @@ public class AccountBankEndpoints : ICarterModule
             var result = await sender.Send(command, cancellationToken);
             return Results.Created($"/wallets/{currentUserService.GetCurrentUserId()}/bank-accounts/{result.BankAccountId}", result);
         })
-        .WithTags("BankAccounts")
+        .WithName("CreateBankAccount")
+.WithDescription("افزودن حساب بانکی جدید به کیف پول کاربر")
+.Produces<CreateBankAccountResponse>(StatusCodes.Status201Created)
+.Produces(StatusCodes.Status401Unauthorized)
+.ProducesProblem(StatusCodes.Status400BadRequest)
+.WithTags("BankAccounts")
         .RequireAuthorization();
 
         // 3. حذف حساب بانکی
@@ -57,7 +68,12 @@ public class AccountBankEndpoints : ICarterModule
             await sender.Send(command, cancellationToken);
             return Results.NoContent();
         })
-        .WithTags("BankAccounts")
+        .WithName("DeleteBankAccount")
+.WithDescription("حذف حساب بانکی از کیف پول کاربر")
+.Produces(StatusCodes.Status204NoContent)
+.Produces(StatusCodes.Status401Unauthorized)
+.ProducesProblem(StatusCodes.Status404NotFound)
+.WithTags("BankAccounts")
         .RequireAuthorization();
     }
 }

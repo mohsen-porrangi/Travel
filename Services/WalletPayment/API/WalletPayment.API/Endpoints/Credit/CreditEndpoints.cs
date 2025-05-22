@@ -10,7 +10,7 @@ using WalletPayment.Application.Credit.Commands.SettleCredit;
 using WalletPayment.Application.Credit.Queries.GetCreditStatus;
 using WalletPayment.Application.Transactions.Commands.CreditPurchase;
 using WalletPayment.Domain.Entities.Enums;
-using WalletPayment.Application.Common.Contracts;
+using BuildingBlocks.Contracts;
 
 namespace WalletPayment.API.Endpoints.Credit;
 
@@ -29,7 +29,12 @@ public class CreditEndpoints : ICarterModule
             var result = await sender.Send(new GetCreditStatusQuery(userId), cancellationToken);
             return Results.Ok(result);
         })
-        .WithTags("Credit")
+        .WithName("GetCreditStatus")
+.WithDescription("دریافت اطلاعات اعتبار فعلی، حد اعتباری و تاریخ سررسید کاربر")
+.Produces<CreditStatusResponse>(StatusCodes.Status200OK)
+.Produces(StatusCodes.Status401Unauthorized)
+.ProducesProblem(StatusCodes.Status404NotFound)
+.WithTags("Credit")
         .RequireAuthorization();
 
         // تخصیص اعتبار به کاربر
@@ -50,7 +55,13 @@ public class CreditEndpoints : ICarterModule
             var result = await sender.Send(command, cancellationToken);
             return Results.Ok(result);
         })
-        .WithTags("Credit")
+        .WithName("AssignCredit")
+.WithDescription("تخصیص اعتبار جدید به کاربر (فقط برای کاربران B2B)")
+.Produces<AssignCreditResponse>(StatusCodes.Status200OK)
+.Produces(StatusCodes.Status401Unauthorized)
+.ProducesProblem(StatusCodes.Status400BadRequest)
+.ProducesProblem(StatusCodes.Status403Forbidden)
+.WithTags("Credit")
         .RequireAuthorization();
 
         // خرید اعتباری
@@ -72,7 +83,12 @@ public class CreditEndpoints : ICarterModule
             var result = await sender.Send(command, cancellationToken);
             return Results.Ok(result);
         })
-        .WithTags("Credit")
+        .WithName("CreditPurchase")
+.WithDescription("انجام خرید با استفاده از اعتبار موجود")
+.Produces<CreditPurchaseResponse>(StatusCodes.Status200OK)
+.Produces(StatusCodes.Status401Unauthorized)
+.ProducesProblem(StatusCodes.Status400BadRequest)
+.WithTags("Credit")
         .RequireAuthorization();
 
         // تسویه اعتبار
@@ -91,7 +107,12 @@ public class CreditEndpoints : ICarterModule
             var result = await sender.Send(command, cancellationToken);
             return Results.Ok(result);
         })
-        .WithTags("Credit")
+        .WithName("SettleCredit")
+.WithDescription("تسویه و پرداخت اعتبار مصرف شده")
+.Produces<SettleCreditResponse>(StatusCodes.Status200OK)
+.Produces(StatusCodes.Status401Unauthorized)
+.ProducesProblem(StatusCodes.Status400BadRequest)
+.WithTags("Credit")
         .RequireAuthorization();
     }
 }

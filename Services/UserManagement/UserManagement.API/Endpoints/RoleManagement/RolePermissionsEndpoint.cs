@@ -8,7 +8,7 @@ namespace UserManagement.API.Endpoints.RoleManagement;
 
 public class RolePermissionsEndpoint : ICarterModule
 {
-    [RequirePermission(RolePermissions.Read)]
+    //[RequirePermission(RolePermissions.Read)]
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         // دریافت دسترسی‌های یک نقش

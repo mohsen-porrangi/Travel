@@ -32,8 +32,13 @@ public class AccountSnapshotEndpoints : ICarterModule
             var result = await sender.Send(query, cancellationToken);
             return Results.Ok(result);
         })
-        .WithTags("AccountHistory")
         .WithName("GetAccountBalanceHistory")
+.WithDescription("دریافت تاریخچه و تغییرات موجودی حساب ارزی در بازه زمانی مشخص")
+.Produces<AccountBalanceHistoryResponse>(StatusCodes.Status200OK)
+.Produces(StatusCodes.Status401Unauthorized)
+.ProducesProblem(StatusCodes.Status404NotFound)
+.ProducesProblem(StatusCodes.Status400BadRequest)
+.WithTags("AccountHistory")
         .RequireAuthorization();
     }
 }

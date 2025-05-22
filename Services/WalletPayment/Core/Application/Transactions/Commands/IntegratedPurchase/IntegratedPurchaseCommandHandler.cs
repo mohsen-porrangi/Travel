@@ -7,10 +7,12 @@ namespace WalletPayment.Application.Transactions.Commands.IntegratedPurchase;
 public class IntegratedPurchaseCommandHandler(
     IWalletRepository walletRepository,
     IUnitOfWork unitOfWork,
-    ICurrencyExchangeService currencyExchangeService) // اضافه کردن سرویس تبدیل ارز
-    : ICommandHandler<IntegratedPurchaseCommand, IntegratedPurchaseResponse>
+    ICurrencyExchangeService currencyExchangeService)
+    : ICommandHandler<IntegratedPurchaseCommand, ExecuteIntegratedPurchaseResponse> // تغییر نام
 {
-    public async Task<IntegratedPurchaseResponse> Handle(IntegratedPurchaseCommand request, CancellationToken cancellationToken)
+    public async Task<ExecuteIntegratedPurchaseResponse> Handle( // تغییر نام
+        IntegratedPurchaseCommand request,
+        CancellationToken cancellationToken)
     {
         try
         {
@@ -113,7 +115,7 @@ public class IntegratedPurchaseCommandHandler(
                 await unitOfWork.CommitTransactionAsync(cancellationToken);
 
                 // بازگشت نتیجه
-                return new IntegratedPurchaseResponse(
+                return new ExecuteIntegratedPurchaseResponse(
                     depositTransaction.Id,
                     purchaseTransaction.Id,
                     request.Amount,

@@ -5,7 +5,7 @@ namespace UserManagement.API.Endpoints.Users.UserStatus;
 
 public class ChangeUserStatusEndpoint : ICarterModule
 {
-    [RequirePermission(UserPermissions.Activate)] // استفاده از مجوز مناسب که هر دو عملیات را پوشش دهد
+  //  [RequirePermission(UserPermissions.Activate)] // استفاده از مجوز مناسب که هر دو عملیات را پوشش دهد
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapPut("/users/{id:guid}/status", async (

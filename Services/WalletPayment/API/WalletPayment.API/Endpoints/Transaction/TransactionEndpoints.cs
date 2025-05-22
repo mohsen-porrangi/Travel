@@ -1,8 +1,8 @@
 ﻿
+using BuildingBlocks.Contracts;
 using Carter;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using WalletPayment.Application.Common.Contracts;
 using WalletPayment.Application.Transactions.Queries.Common;
 using WalletPayment.Application.Transactions.Queries.GetAccountStatement;
 using WalletPayment.Application.Transactions.Queries.GetUserTransactionHistory;
@@ -60,7 +60,11 @@ public class TransactionEndpoints : ICarterModule
             var result = await sender.Send(query, cancellationToken);
             return Results.Ok(result);
         })
-      .WithTags("Transactions")
+      .WithName("GetUserTransactions")
+.WithDescription("دریافت لیست تراکنش‌های کیف پول با فیلتر، مرتب‌سازی و صفحه‌بندی")
+.Produces<PaginatedList<TransactionDto>>(StatusCodes.Status200OK)
+.Produces(StatusCodes.Status401Unauthorized)
+.WithTags("Transactions")
       .RequireAuthorization();
 
         app.MapGet("/wallets/statement", async (
@@ -83,7 +87,12 @@ public class TransactionEndpoints : ICarterModule
             var result = await sender.Send(query, cancellationToken);
             return Results.Ok(result);
         })
-        .WithTags("Transactions")
+        .WithName("GetAccountStatement")
+.WithDescription("دریافت صورتحساب مفصل حساب ارزی در بازه زمانی مشخص")
+.Produces<AccountStatementResponse>(StatusCodes.Status200OK)
+.Produces(StatusCodes.Status401Unauthorized)
+.ProducesProblem(StatusCodes.Status404NotFound)
+.WithTags("Transactions")
         .RequireAuthorization();
 
         app.MapGet("/wallets/summary", async (
@@ -94,7 +103,12 @@ public class TransactionEndpoints : ICarterModule
             var result = await sender.Send(new GetWalletSummaryQuery(currentUserService.GetCurrentUserId()), cancellationToken);
             return Results.Ok(result);
         })
-        .WithTags("Wallets")
+        .WithName("GetWalletSummary")
+.WithDescription("دریافت خلاصه کامل کیف پول شامل موجودی، اعتبار و آمار تراکنش‌ها")
+.Produces<WalletSummaryResponse>(StatusCodes.Status200OK)
+.Produces(StatusCodes.Status401Unauthorized)
+.ProducesProblem(StatusCodes.Status404NotFound)
+.WithTags("Wallets")
         .RequireAuthorization();
     }
 }
