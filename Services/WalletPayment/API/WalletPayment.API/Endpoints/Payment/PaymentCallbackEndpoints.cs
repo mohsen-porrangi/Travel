@@ -16,7 +16,7 @@ public class PaymentCallbackEndpoints : ICarterModule
             HttpContext context,
             [FromQuery] string? integrated,
             [FromQuery] string? gatewayType,
-            IPaymentCallbackProcessor callbackProcessor,
+            [FromServices]IPaymentCallbackProcessor callbackProcessor,
             ISender mediator,
             CancellationToken cancellationToken) =>
         {

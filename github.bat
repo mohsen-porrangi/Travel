@@ -1,6 +1,6 @@
 git init
 git add .
-git commit -m "Initial commit2"
+git commit -m "Initial commit3"
 git branch -M master
 git remote remove origin
 git remote add origin https://github.com/mohsen-porrangi/Travel.git
