@@ -3,7 +3,7 @@
 <Project>
   <PropertyGroup>
     <_PublishTargetUrl>C:\Users\Administrator\Desktop\Source\Travel\Services\UserManagement\UserManagement.API\bin\Debug\net9.0\publish\</_PublishTargetUrl>
-    <History>True|2025-05-20T09:28:36.2702567Z||;True|2025-05-20T11:34:56.9437716+03:30||;True|2025-05-20T10:55:01.6040490+03:30||;True|2025-05-14T14:33:19.7497152+03:30||;True|2025-05-14T14:31:50.5509486+03:30||;True|2025-05-14T13:36:30.1271844+03:30||;True|2025-05-14T13:31:23.4915042+03:30||;</History>
+    <History>True|2025-05-22T08:11:39.6516629Z||;True|2025-05-22T11:28:48.6708969+03:30||;True|2025-05-20T12:58:36.2702567+03:30||;True|2025-05-20T11:34:56.9437716+03:30||;True|2025-05-20T10:55:01.6040490+03:30||;True|2025-05-14T14:33:19.7497152+03:30||;True|2025-05-14T14:31:50.5509486+03:30||;True|2025-05-14T13:36:30.1271844+03:30||;True|2025-05-14T13:31:23.4915042+03:30||;</History>
     <LastFailureDetails />
   </PropertyGroup>
 </Project>

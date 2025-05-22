@@ -11,8 +11,7 @@ public class AccountEndpoints : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapGet("/wallets/accounts", async (
-            [FromServices] ICurrentUserService currentUserService,
-            Guid userId,
+            [FromServices] ICurrentUserService currentUserService,            
             ISender sender,
             CancellationToken cancellationToken) =>
         {

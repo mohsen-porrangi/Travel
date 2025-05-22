@@ -1,8 +1,6 @@
 ﻿using Carter;
-using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
-using WalletPayment.API.Models.Payment;
 using WalletPayment.Application.Common.Contracts;
 
 namespace WalletPayment.API.Endpoints.Refund;
@@ -16,7 +14,7 @@ public class RefundEndpoints : ICarterModule
             [FromQuery] Guid? transactionId,
             [FromQuery] Guid? paymentId,
             [FromServices] ICurrentUserService currentUserService,
-            [FromServices] IRefundService refundService,
+            [FromServices] IRefundService refundService,            
             CancellationToken cancellationToken) =>
         {
             var userId = currentUserService.GetCurrentUserId();

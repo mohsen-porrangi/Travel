@@ -35,9 +35,14 @@ namespace WalletPayment.API
             builder.Services.AddExceptionHandler<ErrorHandlerMiddleware>();
             builder.Services.AddProblemDetails();
 
+            builder.Services.AddHttpContextAccessor();
+
             // Authentication & Authorization
             builder.Services.AddAuthentication();
             builder.Services.AddAuthorization();
+
+            //Inject Service TODO move to dependency incejection
+            builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 
             var app = builder.Build();
 

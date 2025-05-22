@@ -16,7 +16,7 @@ public class ExportTransactionsEndpoint : ICarterModule
         app.MapGet("/wallets/transactions/export", async (
             [FromServices] ICurrentUserService currentUserService,
             ISender sender,
-            CancellationToken cancellationToken,  // پارامتر اجباری بدون مقدار پیش‌فرض
+        //TODO    CancellationToken cancellationToken,  // پارامتر اجباری بدون مقدار پیش‌فرض
             [FromQuery] ExportFormat format = ExportFormat.Csv,
             [FromQuery] DateTime? startDate = null,
             [FromQuery] DateTime? endDate = null,
@@ -48,7 +48,7 @@ public class ExportTransactionsEndpoint : ICarterModule
                 Filter = filter
             };
 
-            var result = await sender.Send(query, cancellationToken);
+            var result = await sender.Send(query/* TODO , cancellationToken*/);
 
             return Results.File(
                 result.FileContents,

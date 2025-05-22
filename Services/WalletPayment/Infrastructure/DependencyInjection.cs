@@ -39,14 +39,14 @@ public static class DependencyInjection
         services.AddScoped<IAccountSnapshotService, AccountSnapshotService>();
         services.AddScoped<INotificationService, NotificationService>();
         services.AddScoped<IPaymentTransactionService, PaymentTransactionService>();
-        services.AddScoped<IRefundService, RefundService>();
+        services.AddScoped<IRefundService, RefundService>();       
 
         // اضافه کردن سرویس‌های پرداخت
         AddPaymentServices(services, configuration);
 
         // ثبت سرویس‌های Background
-        services.AddHostedService<CreditDueDateCheckingService>();
-        services.AddHostedService<AccountSnapshotBackgroundService>();
+      //  services.AddHostedService<CreditDueDateCheckingService>();
+       // services.AddHostedService<AccountSnapshotBackgroundService>();
 
         // سرویس‌های خارجی
         services.AddHttpClient<IUserManagementService, UserManagementServiceClient>(client =>

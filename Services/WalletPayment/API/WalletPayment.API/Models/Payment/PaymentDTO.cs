@@ -5,8 +5,7 @@ namespace WalletPayment.API.Models.Payment;
 
 // مدل‌های درخواست
 public class CreatePaymentRequest
-{
-    public Guid UserId { get; set; }
+{    
     public decimal Amount { get; set; }
     public CurrencyCode Currency { get; set; } = CurrencyCode.IRR;
     public string Description { get; set; } = string.Empty;
