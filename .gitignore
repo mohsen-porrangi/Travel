@@ -6,3 +6,5 @@ obj/
 Migrations/
 .config/
 *.bat
+*.zip
+

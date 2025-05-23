@@ -30,7 +30,7 @@ public class ProcessWalletTransactionCommandHandler(
 
             // برای واریز، حساب جدید ایجاد می‌کنیم
             string accountNumber = GenerateAccountNumber();
-            currencyAccount = wallet.CreateAccount(request.Currency);
+            currencyAccount = wallet.CreateCurrencyAccount(request.Currency);
         }
 
         try

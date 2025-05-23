@@ -25,7 +25,7 @@ namespace WalletPayment.API
             builder.Services.AddWalletPaymentInfrastructure(builder.Configuration);
 
             // Application
-            builder.Services.AddWalletPaymentApplication();
+            builder.Services.AddWalletPaymentApplication(builder.Configuration);
 
             // API
             builder.Services.AddValidatorsFromAssembly(assembly);

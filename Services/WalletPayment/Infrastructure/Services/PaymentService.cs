@@ -208,7 +208,7 @@ public class PaymentService : IPaymentService
                             if (currencyAccount == null)
                             {
                                 // ایجاد حساب جدید                                
-                                currencyAccount = wallet.CreateAccount(payment.Currency);
+                                currencyAccount = wallet.CreateCurrencyAccount(payment.Currency);
                             }
 
                             // شارژ حساب

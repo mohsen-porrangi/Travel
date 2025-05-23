@@ -1,15 +1,18 @@
 ﻿using BuildingBlocks.Contracts;
 using BuildingBlocks.Contracts.Services;
 using BuildingBlocks.Exceptions;
+using BuildingBlocks.Messaging.Contracts;
+using BuildingBlocks.Messaging.Events.UserEvents;
 
 namespace UserManagement.API.Endpoints.Auth.RegisterUser;
 
 internal sealed class VerifyRegisterOtpCommandHandler(
     IUnitOfWork uow,
     IOtpService otpService,
-    IWalletPaymentService walletService,
+    IWalletPaymentService walletService,    
     ITemporaryRegistrationService tempRegistrationService,
-    ILogger<VerifyRegisterOtpCommandHandler> logger
+    ILogger<VerifyRegisterOtpCommandHandler> logger,
+    IMessageBus messageBus
 ) : ICommandHandler<VerifyRegisterOtpCommand>
 {
     public async Task<Unit> Handle(VerifyRegisterOtpCommand command, CancellationToken cancellationToken)
@@ -61,7 +64,7 @@ internal sealed class VerifyRegisterOtpCommandHandler(
                 Mobile = command.Mobile,
                 PasswordHash = tempData.PasswordHash,
                 CreatedAt = DateTime.UtcNow,
-                IsActive = true  // ✅ فعال چون OTP تأیید شده
+                IsActive = true  //  فعال چون OTP تأیید شده
             };
 
             // ایجاد User
@@ -76,24 +79,26 @@ internal sealed class VerifyRegisterOtpCommandHandler(
                 BirthDate = default,
                 CreatedAt = DateTime.UtcNow
             };
-
+          
             // ذخیره در دیتابیس
             await uow.Users.AddIdentityAsync(identity, cancellationToken);
             await uow.Users.AddAsync(user);
-            await uow.SaveChangesAsync(cancellationToken);
+            await uow.SaveChangesAsync(cancellationToken);           
 
             logger.LogInformation("User created successfully: {UserId} for mobile: {Mobile}", user.Id, command.Mobile);
-
-            // ایجاد کیف پول
-            var walletCreated = await walletService.CreateWalletAsync(user.Id, "IRR");
+            // ساخت کیف پول بعد از ساخت کامل یوزر
+            var walletCreated = await walletService.CreateWalletAsync(user.Id, cancellationToken);
             if (!walletCreated)
             {
                 logger.LogError("Failed to create wallet for user: {UserId}", user.Id);
-                throw new InternalServerException("خطا در ایجاد کیف پول",
-                    "کاربر ایجاد شد اما کیف پول ساخته نشد");
+                throw new InternalServerException("خطا در ایجاد کیف پول", "کاربر ایجاد شد اما کیف پول ساخته نشد");
             }
-
             logger.LogInformation("Wallet created successfully for user: {UserId}", user.Id);
+
+            await messageBus.PublishAsync(new UserActivatedEvent(user.Id, user.MasterIdentity.Mobile), cancellationToken);
+
+
+
 
             // commit تراکنش
             await uow.CommitTransactionAsync(cancellationToken);

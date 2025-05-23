@@ -22,7 +22,7 @@ public class WalletEndpoints : ICarterModule
         .Produces(StatusCodes.Status401Unauthorized)
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .ProducesProblem(StatusCodes.Status409Conflict)
-        .WithTags("Wallets")
-        .RequireAuthorization();
+        .WithTags("Wallets");
+       // .RequireAuthorization();
     }
 }

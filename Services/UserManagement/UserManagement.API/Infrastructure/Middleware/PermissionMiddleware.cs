@@ -1,21 +1,19 @@
-﻿using BuildingBlocks.Attributes;
-using BuildingBlocks.Contracts.Security;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Logging;
+﻿using BuildingBlocks.Contracts.Security;
 using System.Security.Claims;
-
 
 namespace UserManagement.API.Infrastructure.Middleware;
 
+//  Primary Constructor در Web layer
 public sealed class PermissionMiddleware(
     RequestDelegate next,
-    IPermissionService permissionService,
+    IServiceScopeFactory scopeFactory,
     ILogger<PermissionMiddleware> logger)
 {
     public async Task InvokeAsync(HttpContext context)
     {
-        //  Modern collection handling
+        using var scope = scopeFactory.CreateScope();
+        var permissionService = scope.ServiceProvider.GetRequiredService<IPermissionService>();
+
         var endpoint = context.GetEndpoint();
         var permissionMetadata = endpoint?.Metadata?.GetOrderedMetadata<RequirePermissionAttribute>();
 
@@ -25,7 +23,7 @@ public sealed class PermissionMiddleware(
             return;
         }
 
-        // ✅ Convert to array for better performance
+        //  Convert to array for better performance
         var permissionAttributes = permissionMetadata.ToArray();
 
         //  Pattern matching with property patterns

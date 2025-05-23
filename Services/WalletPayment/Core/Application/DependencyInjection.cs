@@ -1,6 +1,7 @@
 ﻿using BuildingBlocks.Behaviors;
 using BuildingBlocks.Messaging.Extensions;
 using FluentValidation;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -14,7 +15,7 @@ namespace WalletPayment.Application;
 [ExcludeFromCodeCoverage]
 public static class DependencyInjection
 {
-    public static IServiceCollection AddWalletPaymentApplication(this IServiceCollection services)
+    public static IServiceCollection AddWalletPaymentApplication(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddMediatR(config =>
         {
@@ -23,11 +24,11 @@ public static class DependencyInjection
             config.AddOpenBehavior(typeof(LoggingBehavior<,>));
             config.AddOpenBehavior(typeof(ExceptionHandlingBehavior<,>));
         });
-
+        //services.AddMessaging(configuration, Assembly.GetExecutingAssembly());
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
         // ثبت خودکار Event Handler ها
-        services.RegisterEventHandlers(Assembly.GetExecutingAssembly());
+     //   services.RegisterEventHandlers(Assembly.GetExecutingAssembly());
 
         return services;
     }

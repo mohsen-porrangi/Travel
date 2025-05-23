@@ -69,7 +69,7 @@ namespace UserManagement.API
             builder.Services.AddHealthChecks().AddDbContextCheck<AppDbContext>("Database");
             builder.Services.ConfigureSqlServer(builder.Configuration);
             builder.Services.ConfigureMediatR(builder.Configuration);
-            builder.Services.ConfigureService();
+            builder.Services.ConfigureService(builder.Configuration);
             builder.Services.AddValidatorsFromAssembly(assembly);
             builder.Services.AddCarter();
             builder.Services.AddEndpointsApiExplorer();

@@ -27,7 +27,7 @@ public class IntegratedPurchaseCommandHandler(
             var account = wallet.CurrencyAccount.FirstOrDefault(a => a.Currency == request.Currency && a.IsActive);
             if (account == null)
             {                
-                account = wallet.CreateAccount(request.Currency);
+                account = wallet.CreateCurrencyAccount(request.Currency);
             }
 
             // بررسی موجودی حساب و تبدیل ارز در صورت نیاز

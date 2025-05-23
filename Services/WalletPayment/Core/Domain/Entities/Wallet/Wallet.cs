@@ -38,7 +38,7 @@ public class Wallet : EntityWithDomainEvents<Guid>, IAggregateRoot, ISoftDelete
         AddDomainEvent(new WalletCreatedEvent(Id, userId));
     }
     // ایجاد یک حساب جدید برای ارز مشخص
-    public CurrencyAccount CreateAccount(CurrencyCode currency)
+    public CurrencyAccount CreateCurrencyAccount(CurrencyCode currency)
     {
         if (_currencyAccount.Any(a => a.Currency == currency && !a.IsDeleted))
             throw new InvalidOperationException($"حساب با ارز {currency} قبلاً برای این کیف پول ایجاد شده است");

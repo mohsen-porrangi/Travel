@@ -7,6 +7,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Endpoints\Admin\**" />
+    <Compile Remove="Endpoints\IntegratedPurchase\**" />
+    <Content Remove="Endpoints\Admin\**" />
+    <Content Remove="Endpoints\IntegratedPurchase\**" />
+    <EmbeddedResource Remove="Endpoints\Admin\**" />
+    <EmbeddedResource Remove="Endpoints\IntegratedPurchase\**" />
+    <None Remove="Endpoints\Admin\**" />
+    <None Remove="Endpoints\IntegratedPurchase\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="9.0.0" />
     <PackageReference Include="Carter" Version="8.2.1" />
 	<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.5">
@@ -22,11 +33,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Core\Application\WalletPayment.Application.csproj" />
     <ProjectReference Include="..\..\Infrastructure\WalletPayment.Infrastructure.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Endpoints\Admin\" />
-    <Folder Include="Endpoints\IntegratedPurchase\" />
   </ItemGroup>
 
 </Project>

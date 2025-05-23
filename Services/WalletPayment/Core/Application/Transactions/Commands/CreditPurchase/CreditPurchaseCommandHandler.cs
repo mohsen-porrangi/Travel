@@ -33,7 +33,7 @@ public class CreditPurchaseCommandHandler(
         var currencyAccount = wallet.CurrencyAccount.FirstOrDefault(a => a.Currency == request.Currency && a.IsActive);
         if (currencyAccount == null)
         {            
-            currencyAccount = wallet.CreateAccount(request.Currency);
+            currencyAccount = wallet.CreateCurrencyAccount(request.Currency);
         }
 
         // استفاده از اعتبار

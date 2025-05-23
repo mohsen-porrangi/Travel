@@ -43,7 +43,7 @@ public class ConvertCurrencyCommandHandler(
         if (targetAccount == null)
         {
             // ایجاد خودکار حساب مقصد            
-            targetAccount = wallet.CreateAccount(request.TargetCurrency);
+            targetAccount = wallet.CreateCurrencyAccount(request.TargetCurrency);
         }
 
         // دریافت نرخ تبدیل

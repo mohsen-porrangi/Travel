@@ -18,4 +18,10 @@
     <ProjectReference Include="..\Domain\WalletPayment.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="EventHandlers\UserActivatedEventHandler.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+  </ItemGroup>
+
 </Project>

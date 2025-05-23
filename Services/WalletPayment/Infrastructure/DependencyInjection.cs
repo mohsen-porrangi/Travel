@@ -9,12 +9,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using WalletPayment.Application.Common.Contracts;
+using WalletPayment.Application.EventHandlers;
 using WalletPayment.Application.Payment.Contracts;
 using WalletPayment.Infrastructure.BackgroundServices;
 using WalletPayment.Infrastructure.Data.Context;
-using WalletPayment.Infrastructure.Services;
 using WalletPayment.Infrastructure.ExternalServices.PaymentGateway;
+using WalletPayment.Infrastructure.Services;
 
 namespace WalletPayment.Infrastructure;
 [ExcludeFromCodeCoverage]
@@ -39,7 +41,8 @@ public static class DependencyInjection
         services.AddScoped<IAccountSnapshotService, AccountSnapshotService>();
         services.AddScoped<INotificationService, NotificationService>();
         services.AddScoped<IPaymentTransactionService, PaymentTransactionService>();
-        services.AddScoped<IRefundService, RefundService>();       
+        services.AddScoped<IRefundService, RefundService>();
+       // services.AddTransient<UserActivatedEventHandler>();
 
         // اضافه کردن سرویس‌های پرداخت
         AddPaymentServices(services, configuration);
@@ -51,11 +54,15 @@ public static class DependencyInjection
         // سرویس‌های خارجی
         services.AddHttpClient<IUserManagementService, UserManagementServiceClient>(client =>
         {
-            client.BaseAddress = new Uri(configuration["ServiceUrls:UserManagement"] ?? "http://localhost:5232");
+            client.BaseAddress = new Uri(configuration["ServiceUrls:UserManagement"] ?? "https://localhost:7072");
         });
 
         // سیستم پیام‌رسانی
-        services.AddMessaging(configuration, typeof(DependencyInjection).Assembly);
+        // services.AddMessaging(configuration, Assembly.GetExecutingAssembly());
+         services.AddMessaging(configuration, typeof(UserActivatedEventHandler).Assembly);
+        Console.WriteLine("[DEBUG] AddMessaging loaded from: " + typeof(UserActivatedEventHandler).Assembly.FullName);
+        //services.AddMessaging(configuration, typeof(CreditAssignedEventHandler).Assembly);
+
 
         return services;
     }

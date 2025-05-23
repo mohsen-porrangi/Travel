@@ -16,7 +16,12 @@ public class TemporaryRegistrationService(IMemoryCache cache, ILogger<TemporaryR
         var key = GetKey(mobile);
         var data = new TemporaryRegistrationData(mobile, passwordHash, DateTime.UtcNow);
 
-        cache.Set(key, data, RegistrationExpiry);
+        //cache.Set(key, data, RegistrationExpiry);
+        cache.Set(key, data, new MemoryCacheEntryOptions
+        {
+            AbsoluteExpirationRelativeToNow = RegistrationExpiry,
+            Size = 1 
+        });
 
         logger.LogInformation("Temporary registration stored for mobile: {Mobile}", mobile);
         return Task.CompletedTask;

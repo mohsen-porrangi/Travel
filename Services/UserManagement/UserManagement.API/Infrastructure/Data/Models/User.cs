@@ -1,9 +1,10 @@
 ﻿using BuildingBlocks.Contracts;
+using BuildingBlocks.Domain;
 using BuildingBlocks.Enums;
 
 namespace UserManagement.API.Infrastructure.Data.Models
 {
-    public class User : BaseEntity<Guid> , ISoftDelete
+    public class User : EntityWithDomainEvents<Guid>, IAggregateRoot, ISoftDelete
     {
         public Guid IdentityId { get; set; }
         public MasterIdentity MasterIdentity { get; set; } = default!;

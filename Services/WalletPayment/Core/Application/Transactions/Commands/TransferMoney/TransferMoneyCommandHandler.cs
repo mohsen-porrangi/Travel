@@ -42,7 +42,7 @@ public class TransferMoneyCommandHandler(
         if (targetAccount == null)
         {
             // ایجاد خودکار حساب با ارز مناسب در مقصد           
-            targetAccount = targetWallet.CreateAccount(request.Currency);
+            targetAccount = targetWallet.CreateCurrencyAccount(request.Currency);
         }
 
         // محاسبه کارمزد انتقال

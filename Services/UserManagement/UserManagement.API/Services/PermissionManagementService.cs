@@ -40,11 +40,15 @@ public class PermissionManagementService(
             ))
             .ToListAsync(cancellationToken);
 
-        // ✅ Convert to readonly collection
+        //  Convert to readonly collection
         IReadOnlyList<PermissionDto> readOnlyPermissions = permissions.AsReadOnly();
 
         // ذخیره در cache
-        cache.Set(PERMISSIONS_CACHE_KEY, readOnlyPermissions, CacheExpiry);
+        cache.Set(PERMISSIONS_CACHE_KEY, readOnlyPermissions, new MemoryCacheEntryOptions
+        {
+            AbsoluteExpirationRelativeToNow = CacheExpiry,
+            Size = readOnlyPermissions.Count 
+        });
 
         logger.LogInformation("Loaded {Count} permissions from database into cache", permissions.Count);
         return readOnlyPermissions;
@@ -73,14 +77,18 @@ public class PermissionManagementService(
             ))
             .FirstOrDefaultAsync(cancellationToken);
 
-        // ✅ حالا permission میتونه null باشه چون reference type هست
+        //  حالا permission میتونه null باشه چون reference type هست
         if (permission is not null)
         {
-            cache.Set(cacheKey, permission, CacheExpiry);
+            cache.Set(cacheKey, permission, new MemoryCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = CacheExpiry,
+                Size = 1 
+            });
             logger.LogDebug("Permission {Code} cached", code);
         }
 
-        return permission; // ✅ میتونه null برگردونه
+        return permission; //  میتونه null برگردونه
     }
 
     public async Task<bool> PermissionExistsAsync(string code, CancellationToken cancellationToken = default)
@@ -99,7 +107,7 @@ public class PermissionManagementService(
 
     public Task RefreshPermissionCacheAsync(CancellationToken cancellationToken = default)
     {
-        // ✅ Simple approach - remove main cache key
+        //  Simple approach - remove main cache key
         cache.Remove(PERMISSIONS_CACHE_KEY);
 
         logger.LogInformation("Permission cache refreshed");

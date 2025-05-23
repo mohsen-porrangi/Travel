@@ -14,10 +14,10 @@ public class CreateWalletCommandHandler(
     {
     public async Task<CreateWalletResponse> Handle(CreateWalletCommand request, CancellationToken cancellationToken)
     {
-        // بررسی وجود کاربر
-        bool userExists = await userService.UserExistsAsync(request.UserId);
-        if (!userExists)
-            throw new NotFoundException("کاربر مورد نظر یافت نشد", request.UserId);
+        //// بررسی وجود کاربر
+        //bool userExists = await userService.UserExistsAsync(request.UserId);
+        //if (!userExists)
+        //    throw new NotFoundException("کاربر مورد نظر یافت نشد", request.UserId);
 
         // بررسی عدم وجود کیف پول قبلی
         bool walletExists = await walletRepository.ExistsByUserIdAsync(request.UserId, cancellationToken);
@@ -28,13 +28,14 @@ public class CreateWalletCommandHandler(
         var wallet = new WalletPayment.Domain.Entities.Wallet.Wallet(request.UserId);
 
         // ایجاد حساب پیش‌فرض با ارز ریال        
-        var defaultAccount = wallet.CreateAccount(CurrencyCode.IRR);
+      //  const string DefaultCurrency = "IRR";
+        var defaultCurrencyAccount = wallet.CreateCurrencyAccount(CurrencyCode.IRR);
 
         // ذخیره در دیتابیس
         await walletRepository.AddAsync(wallet, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         // بازگرداندن اطلاعات
-        return new CreateWalletResponse(wallet.Id, defaultAccount.Id);
+        return new CreateWalletResponse(wallet.Id, defaultCurrencyAccount.Id);
     }
 }

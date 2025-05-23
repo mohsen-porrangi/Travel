@@ -1,8 +1,8 @@
 git init
 git add .
 git commit -m "Initial commit4"
-git branch -M master
+git branch -M branch1
 git remote remove origin
 git remote add origin https://github.com/mohsen-porrangi/Travel.git
-git push -u origin master
+git push -u origin branch1
 
