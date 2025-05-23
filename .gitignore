@@ -8,3 +8,5 @@ Migrations/
 *.bat
 *.zip
 
+
+.fake

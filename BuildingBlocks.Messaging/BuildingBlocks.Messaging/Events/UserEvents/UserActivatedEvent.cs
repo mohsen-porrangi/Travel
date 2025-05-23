@@ -1,13 +1,5 @@
-﻿namespace BuildingBlocks.Messaging.Events.UserEvents;
-
-using BuildingBlocks.Messaging.Events;
-using BuildingBlocks.Messaging.Handlers;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
-
+﻿
+namespace BuildingBlocks.Messaging.Events.UserEvents;
 /// <summary>
 /// رویداد فعال‌سازی کاربر
 /// </summary>

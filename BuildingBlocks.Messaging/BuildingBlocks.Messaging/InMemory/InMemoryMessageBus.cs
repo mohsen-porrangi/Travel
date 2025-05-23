@@ -15,19 +15,21 @@ public class InMemoryMessageBus(
     ILogger<InMemoryMessageBus> logger
 ) : IMessageBus
 {
+
     public async Task PublishAsync<T>(T message, CancellationToken cancellationToken = default) where T : IntegrationEvent
     {
-        var eventName = subscriptionsManager.GetEventKey<T>();
+        var actualEventType = message.GetType();
+        var eventName = actualEventType.Name; // Use actual type
 
-        logger.LogInformation("انتشار رویداد {EventName} با شناسه {EventId}", eventName, message.Id);
+        logger.LogInformation("Publishing event {EventName} with ID {EventId}", eventName, message.Id);
 
-        if (!subscriptionsManager.HasSubscriptionsForEvent<T>())
+        if (!subscriptionsManager.HasSubscriptionsForEvent(eventName))
         {
-            logger.LogWarning("هیچ اشتراکی برای رویداد {EventName} وجود ندارد", eventName);
+            logger.LogWarning("No subscriptions found for event {EventName}", eventName);
             return;
         }
 
-        var handlers = subscriptionsManager.GetHandlersForEvent<T>();
+        var handlers = subscriptionsManager.GetHandlersForEvent(eventName);
 
         using var scope = serviceProvider.CreateScope();
 
@@ -37,13 +39,13 @@ public class InMemoryMessageBus(
 
             if (handler == null)
             {
-                logger.LogWarning("هندلر {HandlerType} برای رویداد {EventName} پیدا نشد", handlerType.Name, eventName);
+                logger.LogWarning("Handler {HandlerType} not found for event {EventName}", handlerType.Name, eventName);
                 continue;
             }
 
-            logger.LogDebug("پردازش رویداد {EventName} توسط هندلر {HandlerType}", eventName, handlerType.Name);
+            logger.LogDebug("Processing event {EventName} with handler {HandlerType}", eventName, handlerType.Name);
 
-            var concreteType = typeof(IIntegrationEventHandler<>).MakeGenericType(typeof(T));
+            var concreteType = typeof(IIntegrationEventHandler<>).MakeGenericType(actualEventType); // Use actual type
             var handleMethod = concreteType.GetMethod("HandleAsync");
 
             if (handleMethod != null)

@@ -23,7 +23,9 @@ public class InMemoryMessageBusSubscriptionsManager : IMessageBusSubscriptionsMa
 
         if (_handlers[eventName].Contains(typeof(TH)))
         {
+            Console.WriteLine($"Handler {typeof(TH).Name} already registered for {eventName}");
             throw new ArgumentException($"هندلر {typeof(TH).Name} قبلاً برای رویداد {eventName} ثبت شده است", nameof(eventName));
+            
         }
 
         _handlers[eventName].Add(typeof(TH));

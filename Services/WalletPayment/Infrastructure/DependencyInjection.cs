@@ -41,8 +41,7 @@ public static class DependencyInjection
         services.AddScoped<IAccountSnapshotService, AccountSnapshotService>();
         services.AddScoped<INotificationService, NotificationService>();
         services.AddScoped<IPaymentTransactionService, PaymentTransactionService>();
-        services.AddScoped<IRefundService, RefundService>();
-       // services.AddTransient<UserActivatedEventHandler>();
+        services.AddScoped<IRefundService, RefundService>();       
 
         // اضافه کردن سرویس‌های پرداخت
         AddPaymentServices(services, configuration);
@@ -58,10 +57,10 @@ public static class DependencyInjection
         });
 
         // سیستم پیام‌رسانی
-        // services.AddMessaging(configuration, Assembly.GetExecutingAssembly());
+        
          services.AddMessaging(configuration, typeof(UserActivatedEventHandler).Assembly);
         Console.WriteLine("[DEBUG] AddMessaging loaded from: " + typeof(UserActivatedEventHandler).Assembly.FullName);
-        //services.AddMessaging(configuration, typeof(CreditAssignedEventHandler).Assembly);
+        
 
 
         return services;

@@ -1,5 +1,4 @@
-﻿// File: BuildingBlocks.Messaging/BuildingBlocks.Messaging/Registration/EventHandlerRegistrationService.cs
-using BuildingBlocks.Messaging.Contracts;
+﻿using BuildingBlocks.Messaging.Contracts;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -14,15 +13,48 @@ public class EventHandlerRegistrationService(
 {
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        var subscriptionsManager = serviceProvider.GetRequiredService<IMessageBusSubscriptionsManager>();
+        Console.WriteLine("🚀 EventHandlerRegistrationService.StartAsync started");
 
-        foreach (var registration in registrations)
+        try
         {
-            var addSubscriptionMethod = typeof(IMessageBusSubscriptionsManager)
-                .GetMethod("AddSubscription")
-                ?.MakeGenericMethod(registration.EventType, registration.HandlerType);
+            var subscriptionsManager = serviceProvider.GetRequiredService<IMessageBusSubscriptionsManager>();
+            var registrationsList = registrations.ToList();
 
-            addSubscriptionMethod?.Invoke(subscriptionsManager, Array.Empty<object>());
+            Console.WriteLine($"📝 Total registrations: {registrationsList.Count}");
+
+            foreach (var registration in registrationsList)
+            {
+                Console.WriteLine($"📌 Registering: {registration.EventType.Name} -> {registration.HandlerType.Name}");
+
+                try
+                {
+                    var addSubscriptionMethod = typeof(IMessageBusSubscriptionsManager)
+                        .GetMethod("AddSubscription")
+                        ?.MakeGenericMethod(registration.EventType, registration.HandlerType);
+
+                    if (addSubscriptionMethod == null)
+                    {
+                        Console.WriteLine($"❌ AddSubscription method not found for {registration.EventType.Name}");
+                        continue;
+                    }
+
+                    addSubscriptionMethod.Invoke(subscriptionsManager, Array.Empty<object>());
+                    Console.WriteLine($"✅ Registered: {registration.EventType.Name}");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"❌ Error registering {registration.EventType.Name}: {ex.Message}");
+                    if (ex.InnerException != null)
+                        Console.WriteLine($"   Inner: {ex.InnerException.Message}");
+                }
+            }
+
+            Console.WriteLine("✅ EventHandlerRegistrationService.StartAsync completed");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"💥 General error in StartAsync: {ex.Message}");
+            throw;
         }
 
         return Task.CompletedTask;
