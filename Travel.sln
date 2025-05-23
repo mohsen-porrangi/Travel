@@ -39,6 +39,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WalletPayment.Infrastructur
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WalletPayment.API", "Services\WalletPayment\API\WalletPayment.API\WalletPayment.API.csproj", "{50043594-E6AB-AF98-7F70-E44789F015E3}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ApiGateways", "ApiGateways", "{CAFA376E-7338-4A76-B7D2-8A306CA776B8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YarpApiGateway", "Services\ApiGateways\YarpApiGateway\YarpApiGateway.csproj", "{49A81C70-045D-46D1-9015-8FF6738DF5E7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -77,6 +81,10 @@ Global
 		{50043594-E6AB-AF98-7F70-E44789F015E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{50043594-E6AB-AF98-7F70-E44789F015E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{50043594-E6AB-AF98-7F70-E44789F015E3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{49A81C70-045D-46D1-9015-8FF6738DF5E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{49A81C70-045D-46D1-9015-8FF6738DF5E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{49A81C70-045D-46D1-9015-8FF6738DF5E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{49A81C70-045D-46D1-9015-8FF6738DF5E7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -97,6 +105,8 @@ Global
 		{E351D1C3-01EA-445F-9A9A-BAE04FF4CA79} = {41F6B437-7556-494C-BD6B-DE1D961AC191}
 		{3707904A-17A2-41D2-B332-06561F0BEDD4} = {0A966B14-EC04-428E-8CAF-B788E2561F2E}
 		{50043594-E6AB-AF98-7F70-E44789F015E3} = {13FB30AA-778C-44CC-8A82-C616007F10AF}
+		{CAFA376E-7338-4A76-B7D2-8A306CA776B8} = {8EDFB681-0257-4BB4-A35B-8544924DF88D}
+		{49A81C70-045D-46D1-9015-8FF6738DF5E7} = {CAFA376E-7338-4A76-B7D2-8A306CA776B8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1271070C-8769-456A-9AD8-6E6C630CADC8}
