@@ -12,13 +12,13 @@ public class IntegratedPurchaseEndpoints : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        // Endpoint برای آغاز فرآیند خرید یکپارچه - ایجاد درخواست پرداخت و هدایت به درگاه
+        // Endpoint برای آغاز فرآیند خرید یکپارچه
         app.MapPost("/payments/integrated", async (
             [FromBody] CreateIntegratedPurchaseRequest request,
             ISender sender,
             CancellationToken cancellationToken) =>
         {
-            var command = new Application.Payment.Commands.CreateIntegratedPurchase.CreateIntegratedPurchaseCommand
+            var command = new CreateIntegratedPurchaseCommand
             {
                 UserId = request.UserId,
                 Amount = request.Amount,
@@ -34,15 +34,36 @@ public class IntegratedPurchaseEndpoints : ICarterModule
 
             if (result.IsSuccessful)
             {
-                return Results.Ok(new
+                if (result.RequiresPayment)
                 {
-                    success = true,
-                    paymentUrl = result.PaymentUrl,
-                    authority = result.Authority,
-                    currentBalance = result.CurrentBalance,
-                    amountFromWallet = result.AmountFromWallet,
-                    amountToPay = result.AmountToPay
-                });
+                    // نیاز به پرداخت از درگاه
+                    return Results.Ok(new
+                    {
+                        success = true,
+                        requiresPayment = true,
+                        paymentUrl = result.PaymentUrl,
+                        authority = result.Authority,
+                        currentBalance = result.CurrentBalance,
+                        amountFromWallet = result.AmountFromWallet,
+                        amountToPay = result.AmountToPay,
+                        totalAmount = result.TotalAmount,
+                        message = $"موجودی کیف پول {result.CurrentBalance:N0} تومان است. مبلغ {result.AmountToPay:N0} تومان از درگاه پرداخت خواهد شد."
+                    });
+                }
+                else
+                {
+                    // برداشت مستقیم از کیف پول
+                    return Results.Ok(new
+                    {
+                        success = true,
+                        requiresPayment = false,
+                        transactionId = result.TransactionId,
+                        currentBalance = result.CurrentBalance,
+                        amountFromWallet = result.AmountFromWallet,
+                        totalAmount = result.TotalAmount,
+                        message = "خرید با موفقیت از موجودی کیف پول انجام شد."
+                    });
+                }
             }
             else
             {
@@ -54,14 +75,14 @@ public class IntegratedPurchaseEndpoints : ICarterModule
             }
         })
         .WithName("CreateIntegratedPurchase")
-        .WithDescription("شروع فرآیند خرید یکپارچه با شارژ خودکار کیف پول و هدایت به درگاه")
-        .Produces<ExecuteIntegratedPurchaseResponse>(StatusCodes.Status200OK)
+        .WithDescription("شروع فرآیند خرید یکپارچه - بررسی موجودی و هدایت به درگاه در صورت نیاز")
+        .Produces<object>(StatusCodes.Status200OK)
         .Produces(StatusCodes.Status401Unauthorized)
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .WithTags("Payments")
         .RequireAuthorization();
 
-        // Endpoint برای اجرای مستقیم خرید یکپارچه (بدون درگاه پرداخت)
+        // Endpoint برای اجرای مستقیم خرید یکپارچه (پس از پرداخت موفق)
         app.MapPost("/payments/integrated/execute", async (
             [FromBody] ExecuteIntegratedPurchaseRequest request,
             ISender sender,
@@ -80,11 +101,11 @@ public class IntegratedPurchaseEndpoints : ICarterModule
             return Results.Ok(result);
         })
         .WithName("ExecuteIntegratedPurchase")
-.WithDescription("اجرای مستقیم خرید یکپارچه بدون هدایت به درگاه (پس از پرداخت موفق)")
-.Produces<ExecuteIntegratedPurchaseResponse>(StatusCodes.Status200OK)
-.Produces(StatusCodes.Status401Unauthorized)
-.ProducesProblem(StatusCodes.Status400BadRequest)
-.WithTags("Payments")
+        .WithDescription("اجرای نهایی خرید یکپارچه پس از تأیید پرداخت")
+        .Produces<ExecuteIntegratedPurchaseResponse>(StatusCodes.Status200OK)
+        .Produces(StatusCodes.Status401Unauthorized)
+        .ProducesProblem(StatusCodes.Status400BadRequest)
+        .WithTags("Payments")
         .RequireAuthorization();
     }
 }

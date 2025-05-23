@@ -1,10 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Infrastructure.Data.Repositories;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using WalletPayment.Application.Common.Contracts;
 using WalletPayment.Application.Payment.Contracts;
-using WalletPayment.Domain.Entities.Enums;
-using MediatR;
 using WalletPayment.Application.Transactions.Commands.ProcessTransaction;
+using WalletPayment.Domain.Entities.Enums;
 
 namespace WalletPayment.Infrastructure.Services;
 
@@ -12,37 +13,23 @@ namespace WalletPayment.Infrastructure.Services;
 /// سرویس یکپارچه‌سازی عملیات پرداخت و کیف پول
 /// این سرویس عملیات شارژ خودکار کیف پول و برداشت برای خرید را مدیریت می‌کند
 /// </summary>
-public class IntegratedPurchaseService : IIntegratedPurchaseService
+public class IntegratedPurchaseService(
+       IWalletDbContext dbContext,
+       IWalletRepository walletRepository,
+       IPaymentService paymentService,
+       IUnitOfWork unitOfWork,
+       ISender mediator,
+       ILogger<IntegratedPurchaseService> logger) : IIntegratedPurchaseService
 {
-    private readonly IWalletDbContext _dbContext;
-    private readonly IWalletRepository _walletRepository;
-    private readonly IPaymentService _paymentService;
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly ISender _mediator;
-    private readonly ILogger<IntegratedPurchaseService> _logger;
 
-    public IntegratedPurchaseService(
-        IWalletDbContext dbContext,
-        IWalletRepository walletRepository,
-        IPaymentService paymentService,
-        IUnitOfWork unitOfWork,
-        ISender mediator,
-        ILogger<IntegratedPurchaseService> logger)
-    {
-        _dbContext = dbContext;
-        _walletRepository = walletRepository;
-        _paymentService = paymentService;
-        _unitOfWork = unitOfWork;
-        _mediator = mediator;
-        _logger = logger;
-    }
+
 
     /// <summary>
-    /// ایجاد درخواست پرداخت یکپارچه (شارژ کیف پول و برداشت همزمان)
+    /// ایجاد درخواست پرداخت یکپارچه (فقط برای مابه‌التفاوت)
     /// </summary>
     public async Task<IntegratedPurchaseResult> CreateIntegratedPurchaseRequestAsync(
         Guid userId,
-        decimal amount,
+        decimal amount, // این مبلغ همان مابه‌التفاوت است
         CurrencyCode currency,
         string description,
         PaymentGatewayType gatewayType,
@@ -52,15 +39,15 @@ public class IntegratedPurchaseService : IIntegratedPurchaseService
     {
         try
         {
-            _logger.LogInformation(
-                "شروع فرآیند خرید یکپارچه برای کاربر {UserId}، مبلغ {Amount}، شناسه سفارش {OrderId}",
+            logger.LogInformation(
+                "شروع فرآیند شارژ کیف پول برای خرید یکپارچه. کاربر {UserId}، مبلغ مابه‌التفاوت {Amount}، شناسه سفارش {OrderId}",
                 userId, amount, orderId);
 
             // بررسی وجود کیف پول
-            var wallet = await _walletRepository.GetByUserIdAsync(userId, cancellationToken);
+            var wallet = await walletRepository.GetByUserIdAsync(userId, cancellationToken);
             if (wallet == null)
             {
-                _logger.LogWarning("کیف پول برای کاربر {UserId} یافت نشد", userId);
+                logger.LogWarning("کیف پول برای کاربر {UserId} یافت نشد", userId);
                 return new IntegratedPurchaseResult
                 {
                     IsSuccessful = false,
@@ -73,15 +60,16 @@ public class IntegratedPurchaseService : IIntegratedPurchaseService
             {
                 ["IntegratedPurchase"] = "true",
                 ["OrderId"] = orderId,
-                ["Description"] = description
+                ["Description"] = description,
+                ["PaymentAmount"] = amount.ToString(), // مبلغ پرداختی از درگاه
             };
 
-            // ایجاد درخواست پرداخت
-            var paymentResult = await _paymentService.CreatePaymentRequestAsync(
+            // ایجاد درخواست پرداخت فقط برای مابه‌التفاوت
+            var paymentResult = await paymentService.CreatePaymentRequestAsync(
                 userId,
-                amount,
+                amount, // فقط مابه‌التفاوت
                 currency,
-                $"شارژ کیف پول برای خرید {description} - سفارش {orderId}",
+                $"شارژ کیف پول برای تکمیل خرید {description} - سفارش {orderId}",
                 gatewayType,
                 callbackUrl,
                 metadata,
@@ -91,8 +79,8 @@ public class IntegratedPurchaseService : IIntegratedPurchaseService
 
             if (!paymentResult.IsSuccessful)
             {
-                _logger.LogError(
-                    "خطا در ایجاد درخواست پرداخت یکپارچه: {ErrorMessage}",
+                logger.LogError(
+                    "خطا در ایجاد درخواست پرداخت برای مابه‌التفاوت: {ErrorMessage}",
                     paymentResult.ErrorMessage);
 
                 return new IntegratedPurchaseResult
@@ -102,9 +90,9 @@ public class IntegratedPurchaseService : IIntegratedPurchaseService
                 };
             }
 
-            _logger.LogInformation(
-                "درخواست پرداخت یکپارچه با موفقیت ایجاد شد. شناسه مرجع: {Authority}",
-                paymentResult.Authority);
+            logger.LogInformation(
+                "درخواست پرداخت مابه‌التفاوت با موفقیت ایجاد شد. شناسه مرجع: {Authority}, مبلغ: {Amount}",
+                paymentResult.Authority, amount);
 
             return new IntegratedPurchaseResult
             {
@@ -115,15 +103,15 @@ public class IntegratedPurchaseService : IIntegratedPurchaseService
         }
         catch (Exception ex)
         {
-            _logger.LogError(
+            logger.LogError(
                 ex,
-                "خطا در ایجاد درخواست پرداخت یکپارچه: کاربر {UserId}, مبلغ {Amount}",
+                "خطا در ایجاد درخواست پرداخت مابه‌التفاوت: کاربر {UserId}, مبلغ {Amount}",
                 userId, amount);
 
             return new IntegratedPurchaseResult
             {
                 IsSuccessful = false,
-                ErrorMessage = "خطای داخلی در ایجاد درخواست پرداخت یکپارچه"
+                ErrorMessage = "خطای داخلی در ایجاد درخواست پرداخت"
             };
         }
     }
@@ -133,7 +121,7 @@ public class IntegratedPurchaseService : IIntegratedPurchaseService
     /// </summary>
     public async Task<IntegratedPurchaseCompletionResult> CompleteIntegratedPurchaseAsync(
         Guid userId,
-        decimal amount,
+        decimal totalAmount, // مبلغ کل خرید
         CurrencyCode currency,
         string orderId,
         string paymentReferenceId,
@@ -142,75 +130,86 @@ public class IntegratedPurchaseService : IIntegratedPurchaseService
     {
         try
         {
-            _logger.LogInformation(
-                "تکمیل فرآیند خرید یکپارچه برای کاربر {UserId}، مبلغ {Amount}، شناسه سفارش {OrderId}",
-                userId, amount, orderId);
+            logger.LogInformation(
+                "تکمیل فرآیند خرید یکپارچه برای کاربر {UserId}، مبلغ کل {TotalAmount}، شناسه سفارش {OrderId}",
+                userId, totalAmount, orderId);
+
+            // دریافت کیف پول
+            var wallet = await walletRepository.GetByUserIdAsync(userId, cancellationToken);
+            if (wallet == null)
+            {
+                return new IntegratedPurchaseCompletionResult
+                {
+                    IsSuccessful = false,
+                    ErrorMessage = "کیف پول یافت نشد"
+                };
+            }
+
+            // یافتن حساب با ارز مورد نظر
+            var account = wallet.CurrencyAccount.FirstOrDefault(a => a.Currency == currency && a.IsActive);
+            if (account == null)
+            {
+                return new IntegratedPurchaseCompletionResult
+                {
+                    IsSuccessful = false,
+                    ErrorMessage = "حساب ارزی یافت نشد"
+                };
+            }
 
             // شروع تراکنش
-            await _unitOfWork.BeginTransactionAsync(cancellationToken);
+            await unitOfWork.BeginTransactionAsync(cancellationToken);
 
             try
             {
-                // 1. شارژ کیف پول
-                var depositCommand = new ProcessWalletTransactionCommand(
-                    userId,
-                    amount,
-                    currency,
-                    TransactionDirection.In,
-                    paymentReferenceId,
-                    null,
-                    description);
-                   //TODO $"شارژ خودکار برای سفارش {orderId} - {description}");
+                // Note: شارژ کیف پول قبلاً در PaymentService انجام شده است
+                // در اینجا فقط باید برداشت کل مبلغ خرید را انجام دهیم
 
-                var depositResult = await _mediator.Send(depositCommand, cancellationToken);
-
-                // 2. برداشت از کیف پول برای خرید
+                // برداشت کل مبلغ خرید از کیف پول
                 var withdrawCommand = new ProcessWalletTransactionCommand(
-                     userId,
-                     amount,
-                     currency,
-                     TransactionDirection.Out,
-                     null,
-                     orderId,
-                     description);
+                    userId,
+                    totalAmount,
+                    currency,
+                    TransactionDirection.Out,
+                    null,
+                    orderId,
+                    description);
 
-                var withdrawResult = await _mediator.Send(withdrawCommand, cancellationToken);
+                var withdrawResult = await mediator.Send(withdrawCommand, cancellationToken);
 
                 // تأیید تراکنش
-                await _unitOfWork.CommitTransactionAsync(cancellationToken);
+                await unitOfWork.CommitTransactionAsync(cancellationToken);
 
-                _logger.LogInformation(
-                    "فرآیند خرید یکپارچه با موفقیت تکمیل شد. شناسه تراکنش واریز: {DepositTransactionId}, " +
-                    "شناسه تراکنش برداشت: {WithdrawTransactionId}",
-                    depositResult.TransactionId, withdrawResult.TransactionId);
+                logger.LogInformation(
+                    "فرآیند خرید یکپارچه با موفقیت تکمیل شد. شناسه تراکنش برداشت: {WithdrawTransactionId}",
+                    withdrawResult.TransactionId);
 
                 return new IntegratedPurchaseCompletionResult
                 {
                     IsSuccessful = true,
-                    DepositTransactionId = depositResult.TransactionId,
+                    DepositTransactionId = Guid.Empty, // شارژ قبلاً انجام شده
                     WithdrawTransactionId = withdrawResult.TransactionId,
-                    Amount = amount,
-             //TODO       RemainingBalance = withdrawResult.RemainingBalance
+                    Amount = totalAmount,
+                    RemainingBalance = withdrawResult.NewBalance
                 };
             }
             catch (Exception ex)
             {
                 // برگرداندن تراکنش در صورت بروز خطا
-                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                await unitOfWork.RollbackTransactionAsync(cancellationToken);
                 throw;
             }
         }
         catch (Exception ex)
         {
-            _logger.LogError(
+            logger.LogError(
                 ex,
                 "خطا در تکمیل خرید یکپارچه: کاربر {UserId}, مبلغ {Amount}, سفارش {OrderId}",
-                userId, amount, orderId);
+                userId, totalAmount, orderId);
 
             return new IntegratedPurchaseCompletionResult
             {
                 IsSuccessful = false,
-                ErrorMessage = "خطای داخلی در تکمیل فرآیند خرید یکپارچه"
+                ErrorMessage = "خطای داخلی در تکمیل فرآیند خرید"
             };
         }
     }

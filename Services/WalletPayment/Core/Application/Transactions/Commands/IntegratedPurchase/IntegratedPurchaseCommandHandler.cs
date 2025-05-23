@@ -2,15 +2,17 @@
 using BuildingBlocks.Exceptions;
 using WalletPayment.Application.Common.Contracts;
 using WalletPayment.Domain.Entities.Enums;
+using WalletPayment.Application.Common.Exceptions;
 
 namespace WalletPayment.Application.Transactions.Commands.IntegratedPurchase;
+
 public class IntegratedPurchaseCommandHandler(
     IWalletRepository walletRepository,
     IUnitOfWork unitOfWork,
     ICurrencyExchangeService currencyExchangeService)
-    : ICommandHandler<IntegratedPurchaseCommand, ExecuteIntegratedPurchaseResponse> // تغییر نام
+    : ICommandHandler<IntegratedPurchaseCommand, ExecuteIntegratedPurchaseResponse>
 {
-    public async Task<ExecuteIntegratedPurchaseResponse> Handle( // تغییر نام
+    public async Task<ExecuteIntegratedPurchaseResponse> Handle(
         IntegratedPurchaseCommand request,
         CancellationToken cancellationToken)
     {
@@ -20,95 +22,51 @@ public class IntegratedPurchaseCommandHandler(
             var wallet = await walletRepository.GetByUserIdAsync(request.UserId, cancellationToken);
             if (wallet == null)
                 throw new NotFoundException("کیف پول برای کاربر مورد نظر یافت نشد", request.UserId);
+
             if (!wallet.IsActive)
                 throw new BadRequestException("کیف پول غیرفعال است و امکان خرید وجود ندارد");
 
-            // پیدا کردن حساب متناسب با ارز درخواستی یا ایجاد حساب جدید
+            // پیدا کردن حساب متناسب با ارز درخواستی
             var account = wallet.CurrencyAccount.FirstOrDefault(a => a.Currency == request.Currency && a.IsActive);
             if (account == null)
-            {                
+            {
                 account = wallet.CreateCurrencyAccount(request.Currency);
             }
 
-            // بررسی موجودی حساب و تبدیل ارز در صورت نیاز
-            decimal requiredAmount = request.Amount;
-            bool needsCurrencyConversion = false;
-            Guid? sourceAccountId = null;
-            decimal convertedAmount = 0;
-            decimal conversionFee = 0;
-
-            if (account.Balance < requiredAmount && request.AutoConvertCurrency)
+            // بررسی موجودی کافی
+            if (account.Balance < request.Amount)
             {
-                // بررسی سایر حساب‌ها برای موجودی کافی
-                var otherAccounts = wallet.CurrencyAccount
-                    .Where(a => a.IsActive && a.Balance > 0 && a.Currency != request.Currency)
-                    .OrderByDescending(a => a.Balance) // اولویت با حساب‌های با موجودی بیشتر
-                    .ToList();
-
-                foreach (var sourceAccount in otherAccounts)
-                {
-                    // محاسبه مقدار مورد نیاز در ارز حساب منبع
-                    var (requiredSourceAmount, fee) = await currencyExchangeService.CalculateConversionAsync(
-                        requiredAmount - account.Balance, // مقدار کمبود
-                        request.Currency,
-                        sourceAccount.Currency);
-
-                    // اگر موجودی کافی است، تبدیل ارز انجام می‌شود
-                    if (sourceAccount.Balance >= requiredSourceAmount)
-                    {
-                        // ذخیره اطلاعات برای تبدیل ارز
-                        needsCurrencyConversion = true;
-                        sourceAccountId = sourceAccount.Id;
-                        convertedAmount = requiredSourceAmount;
-                        conversionFee = fee;
-                        break;
-                    }
-                }
+                throw new InsufficientBalanceException(
+                    wallet.Id,
+                    request.Amount,
+                    account.Balance);
             }
 
             // شروع تراکنش
             await unitOfWork.BeginTransactionAsync(cancellationToken);
+
             try
             {
-                // متغیرها برای نگهداری تراکنش‌های ایجاد شده
-                var conversionSourceTransaction = default(WalletPayment.Domain.Entities.Transaction.Transaction);
-                var conversionTargetTransaction = default(WalletPayment.Domain.Entities.Transaction.Transaction);
+                // Note: در اینجا فرض می‌کنیم که:
+                // 1. اگر PaymentReferenceId دارد، یعنی شارژ از درگاه انجام شده
+                // 2. موجودی کیف پول به‌روز است و شامل مبلغ شارژ شده است
 
-                // اگر نیاز به تبدیل ارز باشد، ابتدا تبدیل انجام می‌شود
-                if (needsCurrencyConversion && sourceAccountId.HasValue)
-                {
-                    var sourceAccount = wallet.CurrencyAccount.First(a => a.Id == sourceAccountId.Value);
+                // ایجاد یک شناسه یکتا برای خرید
+                var purchaseId = Guid.NewGuid();
 
-                    // برداشت از حساب منبع
-                    var withdrawDescription = $"تبدیل ارز از {sourceAccount.Currency} به {request.Currency} برای خرید {request.Description}";
-                    conversionSourceTransaction = sourceAccount.Withdraw(
-                        convertedAmount,
-                        TransactionType.Transfer,
-                        withdrawDescription);
-
-                    // محاسبه مقدار نهایی پس از تبدیل (با کسر کارمزد)
-                    var finalConvertedAmount = convertedAmount - conversionFee;
-
-                    // واریز به حساب هدف
-                    var depositDescription = $"دریافت از تبدیل ارز {sourceAccount.Currency} برای خرید {request.Description}";
-                    conversionTargetTransaction = account.Deposit(
-                        finalConvertedAmount,
-                        depositDescription,
-                        null);
-                }
-
-                // 1. شارژ کیف پول
-                var depositTransaction = account.Deposit(
-                    request.Amount,
-                    $"شارژ خودکار برای سفارش {request.OrderId}",
-                    request.PaymentReferenceId);
-
-                // 2. برداشت از کیف پول
+                // برداشت از حساب برای خرید
                 var purchaseTransaction = account.Withdraw(
                     request.Amount,
                     TransactionType.Purchase,
                     request.Description,
                     request.OrderId);
+
+                // اگر شماره مرجع پرداخت داریم، آن را ثبت کنیم
+                if (!string.IsNullOrEmpty(request.PaymentReferenceId))
+                {
+                    // این نشان می‌دهد که بخشی از مبلغ از طریق درگاه پرداخت شده
+                    purchaseTransaction.SetRelatedTransactionId(purchaseId);
+                }
 
                 // ذخیره تغییرات و تأیید تراکنش
                 walletRepository.Update(wallet);
@@ -116,7 +74,7 @@ public class IntegratedPurchaseCommandHandler(
 
                 // بازگشت نتیجه
                 return new ExecuteIntegratedPurchaseResponse(
-                    depositTransaction.Id,
+                    Guid.Empty, // در این روش جدید، deposit transaction id نداریم
                     purchaseTransaction.Id,
                     request.Amount,
                     account.Balance,
@@ -130,10 +88,15 @@ public class IntegratedPurchaseCommandHandler(
                 throw;
             }
         }
-        catch (Exception ex)
+        catch (InsufficientBalanceException)
         {
             throw;
         }
+        catch (Exception ex)
+        {
+            throw new InternalServerException(
+                "خطا در انجام خرید یکپارچه",
+                $"UserId: {request.UserId}, Amount: {request.Amount}, OrderId: {request.OrderId}");
+        }
     }
-
 }

@@ -24,6 +24,7 @@ public record CreateIntegratedPurchaseResponse
     public decimal AmountFromWallet { get; init; }
     public decimal AmountToPay { get; init; }
     public decimal TotalAmount { get; init; }
-    public bool UseWalletBalance { get; init; }
+    public bool RequiresPayment { get; init; } 
+    public Guid? TransactionId { get; init; } // در صورت برداشت مستقیم از کیف پول
     public string? ErrorMessage { get; init; }
 }
