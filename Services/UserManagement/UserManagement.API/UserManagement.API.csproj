@@ -35,6 +35,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Endpoints\Internal\Profile\" />
     <Folder Include="Events\" />
   </ItemGroup>
 

@@ -1,4 +1,4 @@
-﻿namespace UserManagement.API.Endpoints.Endpoints.Auth.CheckUserByMobile
+﻿namespace UserManagement.API.Endpoints.Auth.CheckUserByMobile
 {
 
     public record CheckUserByMobileQuery(string Mobile) : IQuery<CheckUserByMobileResponse>;

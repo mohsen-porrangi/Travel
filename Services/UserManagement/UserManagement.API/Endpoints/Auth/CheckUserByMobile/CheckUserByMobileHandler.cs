@@ -1,5 +1,4 @@
-﻿using UserManagement.API.Endpoints.Endpoints.Auth.CheckUserByMobile;
-using UserManagement.API.Infrastructure.Data;
+﻿using UserManagement.API.Infrastructure.Data;
 
 namespace UserManagement.API.Endpoints.Auth.CheckUserByMobile
 {

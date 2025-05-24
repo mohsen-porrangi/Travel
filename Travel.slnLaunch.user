@@ -1,6 +1,6 @@
 [
   {
-    "Name": "UserWallet",
+    "Name": "APIGateway",
     "Projects": [
       {
         "Path": "Services\\UserManagement\\UserManagement.API\\UserManagement.API.csproj",
@@ -8,6 +8,10 @@
       },
       {
         "Path": "Services\\WalletPayment\\API\\WalletPayment.API\\WalletPayment.API.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "Services\\ApiGateways\\YarpApiGateway\\YarpApiGateway.csproj",
         "Action": "Start"
       }
     ]

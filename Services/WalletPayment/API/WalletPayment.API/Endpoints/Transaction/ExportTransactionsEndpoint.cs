@@ -13,7 +13,7 @@ public class ExportTransactionsEndpoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("/wallets/transactions/export", async (
+        app.MapGet("api/wallets/transactions/export", async (
             [FromServices] ICurrentUserService currentUserService,
             ISender sender,
         //TODO    CancellationToken cancellationToken,  // پارامتر اجباری بدون مقدار پیش‌فرض
@@ -55,12 +55,12 @@ public class ExportTransactionsEndpoint : ICarterModule
                 result.ContentType,
                 result.FileName);
         })
-    .WithName("ExportTransactions")
-.WithDescription("دریافت فایل خروجی تراکنش‌ها در فرمت‌های مختلف (CSV, Excel, PDF)")
-.Produces<FileResult>(StatusCodes.Status200OK)
-.Produces(StatusCodes.Status401Unauthorized)
-.ProducesProblem(StatusCodes.Status400BadRequest)
-.WithTags("Transactions")
-    .RequireAuthorization();
+        .WithName("ExportTransactions")
+        .WithDescription("دریافت فایل خروجی تراکنش‌ها در فرمت‌های مختلف (CSV, Excel, PDF)")
+        .Produces<FileResult>(StatusCodes.Status200OK)
+        .Produces(StatusCodes.Status401Unauthorized)
+        .ProducesProblem(StatusCodes.Status400BadRequest)
+        .WithTags("Transactions")
+        .RequireAuthorization();
     }
 }

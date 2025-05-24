@@ -19,11 +19,11 @@ public class CurrencyAccountEndpoints : ICarterModule
             return Results.Ok(result);
         })
         .WithName("GetUserAccounts")
-.WithDescription("دریافت لیست تمام حساب‌های ارزی کیف پول کاربر")
-.Produces<UserCurrencyAccountsResponse>(StatusCodes.Status200OK)
-.Produces(StatusCodes.Status401Unauthorized)
-.ProducesProblem(StatusCodes.Status404NotFound)
-.WithTags("Accounts")
+        .WithDescription("دریافت لیست تمام حساب‌های ارزی کیف پول کاربر")
+        .Produces<UserCurrencyAccountsResponse>(StatusCodes.Status200OK)
+        .Produces(StatusCodes.Status401Unauthorized)
+        .ProducesProblem(StatusCodes.Status404NotFound)
+        .WithTags("Accounts")
         .RequireAuthorization();
     }
 }

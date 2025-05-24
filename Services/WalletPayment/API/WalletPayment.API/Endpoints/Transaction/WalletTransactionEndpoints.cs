@@ -15,7 +15,7 @@ public class WalletTransactionEndpoints : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         // اندپوینت یکپارچه برای تراکنش‌های کیف پول (واریز/برداشت)
-        app.MapPost("/wallets/transactions", async (
+        app.MapPost("api/wallets/transactions", async (
             [FromBody] CreateWalletTransactionRequest request,
             [FromServices] ICurrentUserService currentUserService,
             [FromServices] ISender sender,
@@ -35,13 +35,13 @@ public class WalletTransactionEndpoints : ICarterModule
             var result = await sender.Send(command, cancellationToken);
             return Results.Ok(result);
         })
-     .WithName("CreateWalletTransaction")
-.WithDescription("ایجاد تراکنش کیف پول (واریز یا برداشت)")
-.Produces<WalletTransactionResponse>(StatusCodes.Status200OK)
-.Produces(StatusCodes.Status401Unauthorized)
-.ProducesProblem(StatusCodes.Status400BadRequest)
-.ProducesProblem(StatusCodes.Status409Conflict)
-.WithTags("Wallet Transactions")
+        .WithName("CreateWalletTransaction")
+        .WithDescription("ایجاد تراکنش کیف پول (واریز یا برداشت)")
+        .Produces<WalletTransactionResponse>(StatusCodes.Status200OK)
+        .Produces(StatusCodes.Status401Unauthorized)
+        .ProducesProblem(StatusCodes.Status400BadRequest)
+        .ProducesProblem(StatusCodes.Status409Conflict)
+        .WithTags("Wallet Transactions")
         .RequireAuthorization();    
    
     }

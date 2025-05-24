@@ -1,5 +1,4 @@
-﻿
-namespace UserManagement.API.Endpoints.Auth.Login;
+﻿namespace UserManagement.API.Endpoints.Auth.Login;
 
 public class LoginUserEndpoint : ICarterModule
 {

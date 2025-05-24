@@ -19,5 +19,10 @@ public class CurrentUserService : ICurrentUserService
         return userId ?? throw new UnauthorizedDomainException("کاربر احراز هویت نشده است");
     }
 
+    public Guid GetCurrentUserAccountId()
+    {
+        throw new NotImplementedException();
+    }
+
     public bool IsAuthenticated => _httpContextAccessor.HttpContext?.User.Identity?.IsAuthenticated == true;
 }

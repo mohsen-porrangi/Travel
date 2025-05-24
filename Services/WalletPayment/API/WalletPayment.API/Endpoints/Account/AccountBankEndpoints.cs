@@ -17,7 +17,7 @@ public class AccountBankEndpoints : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         // 1. دریافت لیست حساب‌های بانکی کاربر
-        app.MapGet("/wallets/bank-accounts", async (
+        app.MapGet("api/wallets/bank-accounts", async (
             [FromServices] ICurrentUserService currentUserService,
             ISender sender,
             CancellationToken cancellationToken) =>
@@ -35,7 +35,7 @@ public class AccountBankEndpoints : ICarterModule
         .WithTags("BankAccounts");
 
         // 2. افزودن حساب بانکی جدید
-        app.MapPost("/wallets/bank-accounts", async (
+        app.MapPost("api/wallets/bank-accounts", async (
             [FromServices] ICurrentUserService currentUserService,            
             [FromBody] CreateBankAccountCommand command,
             ISender sender,
@@ -50,15 +50,15 @@ public class AccountBankEndpoints : ICarterModule
             return Results.Created($"/wallets/{currentUserService.GetCurrentUserId()}/bank-accounts/{result.BankAccountId}", result);
         })
         .WithName("CreateBankAccount")
-.WithDescription("افزودن حساب بانکی جدید به کیف پول کاربر")
-.Produces<CreateBankAccountResponse>(StatusCodes.Status201Created)
-.Produces(StatusCodes.Status401Unauthorized)
-.ProducesProblem(StatusCodes.Status400BadRequest)
-.WithTags("BankAccounts")
+        .WithDescription("افزودن حساب بانکی جدید به کیف پول کاربر")
+        .Produces<CreateBankAccountResponse>(StatusCodes.Status201Created)
+        .Produces(StatusCodes.Status401Unauthorized)
+        .ProducesProblem(StatusCodes.Status400BadRequest)
+        .WithTags("BankAccounts")
         .RequireAuthorization();
 
         // 3. حذف حساب بانکی
-        app.MapDelete("/wallets/bank-accounts/{accountId:guid}", async (
+        app.MapDelete("api/wallets/bank-accounts/{accountId:guid}", async (
             [FromServices] ICurrentUserService currentUserService,                        
             Guid accountId,
             ISender sender,
@@ -69,11 +69,11 @@ public class AccountBankEndpoints : ICarterModule
             return Results.NoContent();
         })
         .WithName("DeleteBankAccount")
-.WithDescription("حذف حساب بانکی از کیف پول کاربر")
-.Produces(StatusCodes.Status204NoContent)
-.Produces(StatusCodes.Status401Unauthorized)
-.ProducesProblem(StatusCodes.Status404NotFound)
-.WithTags("BankAccounts")
+        .WithDescription("حذف حساب بانکی از کیف پول کاربر")
+        .Produces(StatusCodes.Status204NoContent)
+        .Produces(StatusCodes.Status401Unauthorized)
+        .ProducesProblem(StatusCodes.Status404NotFound)
+        .WithTags("BankAccounts")
         .RequireAuthorization();
     }
 }

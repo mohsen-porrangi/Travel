@@ -3,21 +3,22 @@ using BuildingBlocks.Exceptions;
 
 namespace WalletPayment.API.Services;
 
-public class CurrentUserService : ICurrentUserService
-{
-    private readonly IHttpContextAccessor _httpContextAccessor;
-
-    public CurrentUserService(IHttpContextAccessor httpContextAccessor)
-    {
-        _httpContextAccessor = httpContextAccessor;
-    }
+public class CurrentUserService(
+    IHttpContextAccessor httpContextAccessor) : ICurrentUserService
+{    
 
     public Guid GetCurrentUserId()
     {
-        var userId = _httpContextAccessor.HttpContext?.Items["CurrentUserId"] as Guid?;
+        var userId = httpContextAccessor.HttpContext?.Items["CurrentUserId"] as Guid?;
 
         return userId ?? throw new UnauthorizedDomainException("کاربر احراز هویت نشده است");
     }
+    public Guid GetCurrentUserAccountId()
+    {
 
-    public bool IsAuthenticated => _httpContextAccessor.HttpContext?.User.Identity?.IsAuthenticated == true;
+        //TODO impeliment
+        return new Guid();
+    }
+
+    public bool IsAuthenticated => httpContextAccessor.HttpContext?.User.Identity?.IsAuthenticated == true;
 }

@@ -10,7 +10,7 @@ public class PaymentEndpoints : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         // 1. ایجاد درخواست پرداخت
-        app.MapPost("/payments", async (
+        app.MapPost("api/payments", async (
             [FromBody] CreatePaymentRequest request,
             [FromServices] ICurrentUserService currentUserService,
             [FromServices] IPaymentService paymentService,
@@ -19,7 +19,7 @@ public class PaymentEndpoints : ICarterModule
             var userId = currentUserService.GetCurrentUserId();
 
             var result = await paymentService.CreatePaymentRequestAsync(
-                userId, // از کاربر جاری
+                userId, 
                 request.Amount,
                 request.Currency,
                 request.Description,
@@ -50,15 +50,15 @@ public class PaymentEndpoints : ICarterModule
             }
         })
         .WithName("CreatePayment")
-.WithDescription("ایجاد درخواست پرداخت جدید و دریافت لینک هدایت به درگاه")
-.Produces<PaymentRequestResult>(StatusCodes.Status200OK)
-.Produces(StatusCodes.Status401Unauthorized)
-.ProducesProblem(StatusCodes.Status400BadRequest)
-.WithTags("Payments")
+        .WithDescription("ایجاد درخواست پرداخت جدید و دریافت لینک هدایت به درگاه")
+        .Produces<PaymentRequestResult>(StatusCodes.Status200OK)
+        .Produces(StatusCodes.Status401Unauthorized)
+        .ProducesProblem(StatusCodes.Status400BadRequest)
+        .WithTags("Payments")
         .RequireAuthorization();
 
         // 2. دریافت جزئیات پرداخت
-        app.MapGet("/payments/{paymentId:guid}", async (
+        app.MapGet("api/payments/{paymentId:guid}", async (
             Guid paymentId,
             [FromServices] ICurrentUserService currentUserService,
             [FromServices] IPaymentService paymentService,
@@ -82,16 +82,16 @@ public class PaymentEndpoints : ICarterModule
             }
         })
         .WithName("GetPaymentDetails")
-.WithDescription("دریافت اطلاعات کامل یک پرداخت خاص")
-.Produces<PaymentDetailsDto>(StatusCodes.Status200OK)
-.Produces(StatusCodes.Status401Unauthorized)
-.ProducesProblem(StatusCodes.Status404NotFound)
-.ProducesProblem(StatusCodes.Status403Forbidden)
-.WithTags("Payments")
+        .WithDescription("دریافت اطلاعات کامل یک پرداخت خاص")
+        .Produces<PaymentDetailsDto>(StatusCodes.Status200OK)
+        .Produces(StatusCodes.Status401Unauthorized)
+        .ProducesProblem(StatusCodes.Status404NotFound)
+        .ProducesProblem(StatusCodes.Status403Forbidden)
+        .WithTags("Payments")
         .RequireAuthorization();
 
         // 3. دریافت تاریخچه پرداخت‌های کاربر جاری
-        app.MapGet("/payments/history", async (
+        app.MapGet("api/payments/history", async (
             [FromServices] ICurrentUserService currentUserService,
             [FromServices] IPaymentService paymentService,
             [FromQuery] int pageNumber = 1,
@@ -105,10 +105,10 @@ public class PaymentEndpoints : ICarterModule
             return Results.Ok(paymentHistory);
         })
         .WithName("GetPaymentHistory")
-.WithDescription("دریافت تاریخچه تمام پرداخت‌های انجام شده توسط کاربر با صفحه‌بندی")
-.Produces<PaymentHistoryResult>(StatusCodes.Status200OK)
-.Produces(StatusCodes.Status401Unauthorized)
-.WithTags("Payments")
+        .WithDescription("دریافت تاریخچه تمام پرداخت‌های انجام شده توسط کاربر با صفحه‌بندی")
+        .Produces<PaymentHistoryResult>(StatusCodes.Status200OK)
+        .Produces(StatusCodes.Status401Unauthorized)
+        .WithTags("Payments")
         .RequireAuthorization();
     }
 }

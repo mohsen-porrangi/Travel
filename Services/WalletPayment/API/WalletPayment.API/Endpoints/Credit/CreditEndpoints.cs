@@ -19,7 +19,7 @@ public class CreditEndpoints : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         // دریافت وضعیت اعتبار کاربر جاری
-        app.MapGet("/wallets/credit", async (
+        app.MapGet("api/wallets/credit", async (
             [FromServices] ICurrentUserService currentUserService,
             [FromServices] ISender sender,
             CancellationToken cancellationToken) =>
@@ -30,15 +30,15 @@ public class CreditEndpoints : ICarterModule
             return Results.Ok(result);
         })
         .WithName("GetCreditStatus")
-.WithDescription("دریافت اطلاعات اعتبار فعلی، حد اعتباری و تاریخ سررسید کاربر")
-.Produces<CreditStatusResponse>(StatusCodes.Status200OK)
-.Produces(StatusCodes.Status401Unauthorized)
-.ProducesProblem(StatusCodes.Status404NotFound)
-.WithTags("Credit")
+        .WithDescription("دریافت اطلاعات اعتبار فعلی، حد اعتباری و تاریخ سررسید کاربر")
+        .Produces<CreditStatusResponse>(StatusCodes.Status200OK)
+        .Produces(StatusCodes.Status401Unauthorized)
+        .ProducesProblem(StatusCodes.Status404NotFound)
+        .WithTags("Credit")
         .RequireAuthorization();
 
         // تخصیص اعتبار به کاربر
-        app.MapPost("/wallets/credit/assign", async (
+        app.MapPost("api/wallets/credit/assign", async (
             [FromServices] ICurrentUserService currentUserService,
             [FromBody] AssignCreditRequest request,
             [FromServices] ISender sender,
@@ -56,16 +56,16 @@ public class CreditEndpoints : ICarterModule
             return Results.Ok(result);
         })
         .WithName("AssignCredit")
-.WithDescription("تخصیص اعتبار جدید به کاربر (فقط برای کاربران B2B)")
-.Produces<AssignCreditResponse>(StatusCodes.Status200OK)
-.Produces(StatusCodes.Status401Unauthorized)
-.ProducesProblem(StatusCodes.Status400BadRequest)
-.ProducesProblem(StatusCodes.Status403Forbidden)
-.WithTags("Credit")
+        .WithDescription("تخصیص اعتبار جدید به کاربر (فقط برای کاربران B2B)")
+        .Produces<AssignCreditResponse>(StatusCodes.Status200OK)
+        .Produces(StatusCodes.Status401Unauthorized)
+        .ProducesProblem(StatusCodes.Status400BadRequest)
+        .ProducesProblem(StatusCodes.Status403Forbidden)
+        .WithTags("Credit")
         .RequireAuthorization();
 
         // خرید اعتباری
-        app.MapPost("/wallets/credit/purchase", async (
+        app.MapPost("api/wallets/credit/purchase", async (
             [FromServices] ICurrentUserService currentUserService,
             [FromBody] CreditPurchaseRequest request,
             [FromServices] ISender sender,
@@ -84,15 +84,15 @@ public class CreditEndpoints : ICarterModule
             return Results.Ok(result);
         })
         .WithName("CreditPurchase")
-.WithDescription("انجام خرید با استفاده از اعتبار موجود")
-.Produces<CreditPurchaseResponse>(StatusCodes.Status200OK)
-.Produces(StatusCodes.Status401Unauthorized)
-.ProducesProblem(StatusCodes.Status400BadRequest)
-.WithTags("Credit")
+        .WithDescription("انجام خرید با استفاده از اعتبار موجود")
+        .Produces<CreditPurchaseResponse>(StatusCodes.Status200OK)
+        .Produces(StatusCodes.Status401Unauthorized)
+        .ProducesProblem(StatusCodes.Status400BadRequest)
+        .WithTags("Credit")
         .RequireAuthorization();
 
         // تسویه اعتبار
-        app.MapPost("/wallets/credit/settle", async (
+        app.MapPost("api/wallets/credit/settle", async (
             [FromServices] ICurrentUserService currentUserService,
             [FromBody] SettleCreditRequest request,
             [FromServices] ISender sender,
@@ -108,11 +108,11 @@ public class CreditEndpoints : ICarterModule
             return Results.Ok(result);
         })
         .WithName("SettleCredit")
-.WithDescription("تسویه و پرداخت اعتبار مصرف شده")
-.Produces<SettleCreditResponse>(StatusCodes.Status200OK)
-.Produces(StatusCodes.Status401Unauthorized)
-.ProducesProblem(StatusCodes.Status400BadRequest)
-.WithTags("Credit")
+        .WithDescription("تسویه و پرداخت اعتبار مصرف شده")
+        .Produces<SettleCreditResponse>(StatusCodes.Status200OK)
+        .Produces(StatusCodes.Status401Unauthorized)
+        .ProducesProblem(StatusCodes.Status400BadRequest)
+        .WithTags("Credit")
         .RequireAuthorization();
     }
 }
